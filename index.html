@@ -93,7 +93,6 @@
       transform: translateY(-2px);
     }
 
-    /* History / Highscore Container */
     .history-card {
       width: 100%;
       background: rgba(20, 15, 35, 0.85);
@@ -159,11 +158,6 @@
       box-shadow: 0 0 10px rgba(166, 227, 161, 0.3);
     }
 
-    .level-btn.completed {
-      background: #89b4fa;
-      color: #11111b;
-    }
-
     .back-btn {
       background: transparent;
       border: 1px solid rgba(255, 255, 255, 0.3);
@@ -214,7 +208,6 @@
       border-radius: 8px;
     }
 
-    /* Blok Rintangan / Blok Terkunci di Mode Challenge */
     .cell.blocked {
       background-color: #313244 !important;
       border: 1px solid #45475a;
@@ -274,7 +267,6 @@
     .shape-cell.planet-sun { background-color: #ffe66d; }
     .shape-cell.empty { background-color: transparent !important; }
 
-    /* Modal Popup */
     .modal {
       position: fixed;
       top: 0; left: 0; width: 100vw; height: 100vh;
@@ -314,13 +306,13 @@
     <div id="level-grid" class="level-grid"></div>
   </div>
 
-  <!-- 3. SCREEN: GAMEPLAY (CLASSIC & CHALLENGE) -->
+  <!-- 3. SCREEN: GAMEPLAY -->
   <div id="screen-game" class="app-screen">
     <button class="back-btn" onclick="exitGame()">⬅ Menu</button>
     
     <div class="score-container">
       <div class="score-box" id="level-indicator">Classic</div>
-      <div class="score-box">Skor: <span id="score">0</span></div>
+      <div class="score-box" id="score-box-container">Skor: <span id="score">0</span></div>
     </div>
 
     <div id="board" class="board"></div>
@@ -386,6 +378,7 @@
     function startClassicMode() {
       isChallengeMode = false;
       document.getElementById('level-indicator').innerText = 'Classic Mode';
+      document.getElementById('score-box-container').style.display = 'block';
       initGame();
       showScreen('screen-game');
     }
@@ -412,6 +405,7 @@
       isChallengeMode = true;
       currentLevel = level;
       document.getElementById('level-indicator').innerText = `Level ${level}`;
+      document.getElementById('score-box-container').style.display = 'none';
       initGame();
       showScreen('screen-game');
     }
@@ -430,7 +424,8 @@
     }
 
     function generateChallengeObstacles(level) {
-      const obstacleCount = Math.min(4 + Math.floor(level / 5), 24); 
+      // Menghasilkan rintangan hitam unik per level
+      const obstacleCount = Math.min(2 + Math.floor(level / 6), 20); 
       let placed = 0;
       
       while(placed < obstacleCount) {
@@ -500,7 +495,7 @@
         });
       });
 
-      // Event Mouse (Desktop)
+      // Desktop
       container.addEventListener('dragstart', (e) => {
         draggedShape = container;
         draggedShapeMatrix = shape;
@@ -508,7 +503,7 @@
         e.dataTransfer.setData('text/plain', '');
       });
 
-      // Event Sentuhan (HP / Mobile Touch Events)
+      // HP Touch
       container.addEventListener('touchstart', (e) => {
         e.preventDefault();
         const touch = e.touches[0];
@@ -543,7 +538,7 @@
     function moveAt(pageX, pageY) {
       if (draggedShape) {
         draggedShape.style.left = pageX - draggedShape.offsetWidth / 2 + 'px';
-        draggedShape.style.top = pageY - draggedShape.offsetHeight - 20 + 'px'; // Diangkat sedikit di atas jari
+        draggedShape.style.top = pageY - draggedShape.offsetHeight - 20 + 'px';
       }
     }
 
@@ -579,8 +574,11 @@
           draggedShapeMatrix = null;
           draggedShape = null;
 
-          checkAndClearLines();
-          checkChallengeWin();
+          if (isChallengeMode) {
+            checkChallengeWin();
+          } else {
+            checkAndClearLines();
+          }
 
           if (shapesContainer.children.length === 0) generateShapes();
           else checkGameOver();
@@ -640,8 +638,11 @@
         draggedShape.remove();
         draggedShapeMatrix = null;
 
-        checkAndClearLines();
-        checkChallengeWin();
+        if (isChallengeMode) {
+          checkChallengeWin();
+        } else {
+          checkAndClearLines();
+        }
 
         if (shapesContainer.children.length === 0) generateShapes();
         else checkGameOver();
@@ -679,6 +680,7 @@
       scoreElement.innerText = score;
     }
 
+    // MODE CLASSIC: MEKANISME PECAH BARIS & KOLOM
     function checkAndClearLines() {
       let rows = [], cols = [];
       for (let r = 0; r < BOARD_SIZE; r++) {
@@ -718,9 +720,8 @@
       }
     }
 
+    // MODE CHALLENGE: WIN CONDITION KETIKA SEMUA PETAK TERISI PENUH
     function checkChallengeWin() {
-      if (!isChallengeMode) return;
-
       let isFull = true;
       for (let r = 0; r < BOARD_SIZE; r++) {
         for (let c = 0; c < BOARD_SIZE; c++) {
@@ -736,7 +737,7 @@
           unlockedLevels++;
           localStorage.setItem('solar_unlocked_level', unlockedLevels);
         }
-        showModal("LEVEL COMPLETED! 🎉", `Selamat! Kamu berhasil memenuhi papan Level ${currentLevel}!`);
+        showModal("LEVEL COMPLETED! 🎉", `Selamat! Kamu berhasil memenuhi seluruh papan Level ${currentLevel}!`);
       }
     }
 
@@ -755,8 +756,8 @@
       });
 
       if (!canPlace) {
-        saveHistory(score, isChallengeMode ? `Level ${currentLevel}` : 'Classic');
-        showModal("MISSION FAILED 🚀", `Tidak ada ruang tersisa! Skor Akhir: ${score}`);
+        if (!isChallengeMode) saveHistory(score, 'Classic');
+        showModal("MISSION FAILED 🚀", isChallengeMode ? "Tidak ada ruang tersisa untuk menuhin papan!" : `Tidak ada ruang tersisa! Skor Akhir: ${score}`);
       }
     }
 
@@ -773,7 +774,7 @@
     }
 
     function exitGame() {
-      if (score > 0) saveHistory(score, isChallengeMode ? `Level ${currentLevel}` : 'Classic');
+      if (!isChallengeMode && score > 0) saveHistory(score, 'Classic');
       showScreen('screen-home');
     }
 
