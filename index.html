@@ -21,19 +21,23 @@
       align-items: center;
       min-height: 100vh;
       margin: 0;
-      padding: 8px;
+      padding: 10px;
       overflow: hidden;
     }
 
+    /* Container dengan simulasi & batas rasio layar HP 20:9 */
     .app-screen {
       display: none;
       width: 100%;
-      max-width: 320px;
+      max-width: 380px;
+      height: 100vh;
+      max-height: 820px;
+      aspect-ratio: 9 / 20;
       flex-direction: column;
       align-items: center;
       text-align: center;
-      max-height: 100vh;
       justify-content: space-between;
+      padding: 12px 6px;
     }
 
     .app-screen.active {
@@ -55,26 +59,26 @@
       font-size: 11px;
       letter-spacing: 1px;
       color: #f9e2af;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       text-transform: uppercase;
     }
 
     h1.game-title {
-      font-size: clamp(24px, 7vw, 32px);
+      font-size: clamp(26px, 7.5vw, 34px);
       letter-spacing: 2px;
       color: #f5c2e7;
       text-shadow: 0 0 15px rgba(245, 194, 231, 0.6);
-      margin: 0 0 12px 0;
+      margin: 0 0 10px 0;
     }
 
     .menu-btn {
       width: 100%;
-      padding: 10px;
-      margin: 5px 0;
-      font-size: 14px;
+      padding: 12px;
+      margin: 6px 0;
+      font-size: 15px;
       font-weight: bold;
       border: none;
-      border-radius: 10px;
+      border-radius: 12px;
       cursor: pointer;
     }
 
@@ -95,7 +99,7 @@
       background: rgba(20, 15, 35, 0.85);
       border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 12px;
-      padding: 8px;
+      padding: 10px;
       margin-top: 10px;
     }
 
@@ -109,7 +113,7 @@
       list-style: none;
       padding: 0;
       margin: 0;
-      max-height: 90px;
+      max-height: 100px;
       overflow-y: auto;
     }
 
@@ -117,7 +121,7 @@
       display: flex;
       justify-content: space-between;
       padding: 4px 6px;
-      font-size: 11px;
+      font-size: 12px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
 
@@ -126,7 +130,7 @@
       display: grid;
       grid-template-columns: repeat(5, 1fr);
       gap: 6px;
-      max-height: 55vh;
+      max-height: 60vh;
       overflow-y: auto;
       width: 100%;
       padding: 6px;
@@ -157,43 +161,44 @@
       background: transparent;
       border: 1px solid rgba(255, 255, 255, 0.3);
       color: #fff;
-      padding: 5px 10px;
+      padding: 6px 12px;
       border-radius: 8px;
       font-size: 12px;
-      margin-bottom: 8px;
       align-self: flex-start;
     }
 
-    /* === 3. GAMEPLAY (UKURAN LEBIH KECIL SUPAYA TIDAK KETOPONG) === */
+    /* === 3. GAMEPLAY (RASIO TAMPILAN OPTIMAL HP 20:9) === */
     .score-container {
       display: flex;
       justify-content: center;
-      gap: 8px;
-      margin-bottom: 8px;
+      gap: 10px;
+      margin: 8px 0;
       width: 100%;
     }
 
     .score-box {
-      font-size: 12px;
+      font-size: 13px;
       font-weight: bold;
       color: #89dceb;
       background: rgba(255, 255, 255, 0.05);
-      padding: 4px 8px;
-      border-radius: 12px;
+      padding: 5px 12px;
+      border-radius: 14px;
       border: 1px solid rgba(137, 220, 235, 0.2);
     }
 
-    /* Ukuran Papan Diperkecil agar Pas di Layar HP Sempit */
+    /* Papan Game Fleksibel Mengikuti Tinggi & Lebar Layar */
     .board {
       display: grid;
       grid-template-columns: repeat(8, 1fr);
       grid-template-rows: repeat(8, 1fr);
-      gap: 2px;
-      width: min(72vw, 260px);
-      height: min(72vw, 260px);
+      gap: 3px;
+      width: min(76vw, 36vh);
+      height: min(76vw, 36vh);
+      max-width: 310px;
+      max-height: 310px;
       background-color: rgba(20, 15, 35, 0.85);
-      padding: 4px;
-      border-radius: 10px;
+      padding: 5px;
+      border-radius: 12px;
       margin: 0 auto;
       box-shadow: 0 0 15px rgba(137, 180, 250, 0.15);
       border: 1px solid rgba(255, 255, 255, 0.12);
@@ -207,7 +212,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: clamp(10px, 3.5vw, 14px);
+      font-size: clamp(10px, 3.5vw, 15px);
       position: relative;
     }
 
@@ -236,15 +241,15 @@
       display: flex;
       justify-content: space-around;
       width: 100%;
-      margin-top: 8px;
-      min-height: 60px;
+      margin-top: 10px;
+      min-height: 75px;
       align-items: center;
     }
 
     .shape-preview {
       display: grid;
       gap: 2px;
-      padding: 3px;
+      padding: 4px;
       border-radius: 6px;
       background-color: rgba(255, 255, 255, 0.04);
       touch-action: none;
@@ -260,8 +265,8 @@
     }
 
     .shape-cell { 
-      width: min(3.8vw, 13px); 
-      height: min(3.8vw, 13px); 
+      width: min(4vw, 15px); 
+      height: min(4vw, 15px); 
       border-radius: 2px; 
     }
     .shape-cell.planet-mars { background-color: #ff7b54; }
@@ -280,8 +285,8 @@
     }
     .modal.hidden { display: none; }
     .modal-content {
-      background: #1e1e2e; padding: 16px; border-radius: 14px;
-      border: 1px solid #89b4fa; text-align: center; width: 85%; max-width: 260px;
+      background: #1e1e2e; padding: 18px; border-radius: 14px;
+      border: 1px solid #89b4fa; text-align: center; width: 85%; max-width: 270px;
     }
   </style>
 </head>
@@ -294,7 +299,7 @@
       <h1 class="game-title">SOLAR BLAST</h1>
     </div>
     <div style="width: 100%;">
-      <button class="menu-btn btn-classic" onclick="startClassicMode()">PLAY CLASSIC ♾️</button>
+      <button class="menu-btn btn-classic" onclick="startClassicMode()">PLAY CLASSIC ♾️️</button>
       <button class="menu-btn btn-challenge" onclick="openChallengeMap()">CHALLENGE (1-100) 🎯</button>
     </div>
     <div class="history-card">
@@ -306,7 +311,7 @@
   <!-- 2. CHALLENGE LEVEL MAP -->
   <div id="screen-levels" class="app-screen">
     <button class="back-btn" onclick="showScreen('screen-home')">⬅ Kembali</button>
-    <h3 style="margin: 0 0 8px 0; font-size: 14px;">Pilih Level (1-100)</h3>
+    <h3 style="margin: 0 0 10px 0; font-size: 15px;">Pilih Level (1-100)</h3>
     <div id="level-grid" class="level-grid"></div>
   </div>
 
@@ -328,7 +333,7 @@
   <div id="game-modal" class="modal hidden">
     <div class="modal-content">
       <h3 id="modal-title" style="margin-top: 0; font-size: 16px;">MISSION FAILED 🚀</h3>
-      <p id="modal-desc" style="font-size: 12px;">Papan penuh!</p>
+      <p id="modal-desc" style="font-size: 13px;">Papan penuh!</p>
       <button class="menu-btn btn-classic" onclick="closeModalAndRedirect()">Lanjut 🔄</button>
     </div>
   </div>
@@ -528,7 +533,7 @@
       
       const cols = shape[0].length;
       container.style.display = 'grid';
-      container.style.gridTemplateColumns = `repeat(${cols}, min(3.8vw, 13px))`;
+      container.style.gridTemplateColumns = `repeat(${cols}, min(4vw, 15px))`;
 
       shape.forEach((row) => {
         row.forEach((val) => {
@@ -540,7 +545,7 @@
         });
       });
 
-      // KONTROL TOUCH PRESISI
+      // TOUCH DRAG ACCURACY
       container.addEventListener('touchstart', (e) => {
         e.preventDefault();
         const touch = e.touches[0];
@@ -551,7 +556,7 @@
         draggedPlanetClass = planetClass;
 
         touchOffsetX = rect.width / 2;
-        touchOffsetY = rect.height + 25; // Posisi melayang di atas jari
+        touchOffsetY = rect.height + 30; // Melayang presisi di atas jari
 
         container.classList.add('dragging');
         updateDragPosition(touch.clientX, touch.clientY);
@@ -565,13 +570,13 @@
       e.preventDefault();
       const touch = e.touches[0];
       updateDragPosition(touch.clientX, touch.clientY);
-      handleHover(touch.clientX, touch.clientY - touchOffsetY + 10);
+      handleHover(touch.clientX, touch.clientY - touchOffsetY + 15);
     }, { passive: false });
 
     window.addEventListener('touchend', (e) => {
       if (!draggedShape) return;
       const touch = e.changedTouches[0];
-      handleDropAt(touch.clientX, touch.clientY - touchOffsetY + 10);
+      handleDropAt(touch.clientX, touch.clientY - touchOffsetY + 15);
     });
 
     function updateDragPosition(x, y) {
