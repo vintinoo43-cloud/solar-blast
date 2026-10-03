@@ -2,14 +2,14 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Solar Blast App</title>
   <style>
     * {
       box-sizing: border-box;
       user-select: none;
       -webkit-user-select: none;
-      touch-action: manipulation;
+      touch-action: none; /* Mencegah geser/zoom layar di HP */
     }
 
     body {
@@ -21,17 +21,19 @@
       align-items: center;
       min-height: 100vh;
       margin: 0;
-      overflow-x: hidden;
+      padding: 10px;
+      overflow: hidden;
     }
 
     .app-screen {
       display: none;
       width: 100%;
-      max-width: 420px;
+      max-width: 380px;
       flex-direction: column;
       align-items: center;
       text-align: center;
-      padding: 20px;
+      max-height: 100vh;
+      justify-content: space-between;
     }
 
     .app-screen.active {
@@ -48,63 +50,58 @@
     .sponsor-badge {
       background: rgba(255, 255, 255, 0.08);
       border: 1px solid rgba(255, 255, 255, 0.15);
-      padding: 6px 16px;
+      padding: 4px 12px;
       border-radius: 20px;
-      font-size: 12px;
-      letter-spacing: 1.5px;
+      font-size: 11px;
+      letter-spacing: 1px;
       color: #f9e2af;
-      margin-bottom: 15px;
+      margin-bottom: 10px;
       text-transform: uppercase;
     }
 
     h1.game-title {
-      font-size: 38px;
-      letter-spacing: 4px;
+      font-size: clamp(28px, 8vw, 36px);
+      letter-spacing: 3px;
       color: #f5c2e7;
-      text-shadow: 0 0 15px rgba(245, 194, 231, 0.6), 0 0 30px rgba(203, 166, 247, 0.4);
-      margin: 0 0 25px 0;
+      text-shadow: 0 0 15px rgba(245, 194, 231, 0.6);
+      margin: 0 0 15px 0;
     }
 
     .menu-btn {
       width: 100%;
-      padding: 16px;
-      margin: 10px 0;
-      font-size: 18px;
+      padding: 12px;
+      margin: 6px 0;
+      font-size: 15px;
       font-weight: bold;
       border: none;
-      border-radius: 16px;
+      border-radius: 12px;
       cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
     }
 
     .btn-classic {
       background: linear-gradient(45deg, #89b4fa, #b4befe);
       color: #11111b;
-      box-shadow: 0 4px 15px rgba(137, 180, 250, 0.4);
+      box-shadow: 0 4px 12px rgba(137, 180, 250, 0.3);
     }
 
     .btn-challenge {
       background: linear-gradient(45deg, #f5c2e7, #cba6f7);
       color: #11111b;
-      box-shadow: 0 4px 15px rgba(245, 194, 231, 0.4);
-    }
-
-    .menu-btn:hover {
-      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(245, 194, 231, 0.3);
     }
 
     .history-card {
       width: 100%;
       background: rgba(20, 15, 35, 0.85);
       border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 16px;
-      padding: 15px;
-      margin-top: 25px;
+      border-radius: 12px;
+      padding: 10px;
+      margin-top: 15px;
     }
 
     .history-card h3 {
-      margin: 0 0 10px 0;
-      font-size: 16px;
+      margin: 0 0 6px 0;
+      font-size: 14px;
       color: #89dceb;
     }
 
@@ -112,15 +109,15 @@
       list-style: none;
       padding: 0;
       margin: 0;
-      max-height: 120px;
+      max-height: 100px;
       overflow-y: auto;
     }
 
     .history-item {
       display: flex;
       justify-content: space-between;
-      padding: 6px 10px;
-      font-size: 14px;
+      padding: 4px 8px;
+      font-size: 12px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
 
@@ -128,13 +125,13 @@
     .level-grid {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
-      gap: 10px;
-      max-height: 380px;
+      gap: 8px;
+      max-height: 60vh;
       overflow-y: auto;
       width: 100%;
-      padding: 10px;
+      padding: 8px;
       background: rgba(20, 15, 35, 0.85);
-      border-radius: 16px;
+      border-radius: 12px;
       border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
@@ -144,9 +141,8 @@
       border: 1px solid rgba(255, 255, 255, 0.1);
       color: #cdd6f4;
       font-weight: bold;
-      border-radius: 12px;
-      cursor: pointer;
-      font-size: 14px;
+      border-radius: 8px;
+      font-size: 13px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -155,129 +151,119 @@
     .level-btn.unlocked {
       background: linear-gradient(135deg, #a6e3a1, #94e2d5);
       color: #11111b;
-      box-shadow: 0 0 10px rgba(166, 227, 161, 0.3);
     }
 
     .back-btn {
       background: transparent;
       border: 1px solid rgba(255, 255, 255, 0.3);
       color: #fff;
-      padding: 8px 16px;
-      border-radius: 12px;
-      cursor: pointer;
-      margin-bottom: 15px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      margin-bottom: 10px;
       align-self: flex-start;
     }
 
-    /* === 3. GAMEPLAY (CLASSIC & CHALLENGE) === */
+    /* === 3. GAMEPLAY (UKURAN DIPERKECIL & RESPOSIF HP) === */
     .score-container {
       display: flex;
       justify-content: center;
-      gap: 15px;
-      margin-bottom: 15px;
+      gap: 10px;
+      margin-bottom: 10px;
+      width: 100%;
     }
 
     .score-box {
-      font-size: 16px;
+      font-size: 13px;
       font-weight: bold;
       color: #89dceb;
       background: rgba(255, 255, 255, 0.05);
-      padding: 6px 14px;
-      border-radius: 20px;
+      padding: 4px 10px;
+      border-radius: 15px;
       border: 1px solid rgba(137, 220, 235, 0.2);
     }
 
+    /* Board yang dapat menyesuaikan layar HP */
     .board {
       display: grid;
-      grid-template-columns: repeat(8, 42px);
-      grid-template-rows: repeat(8, 42px);
-      gap: 4px;
+      grid-template-columns: repeat(8, 1fr);
+      grid-template-rows: repeat(8, 1fr);
+      gap: 3px;
+      width: min(82vw, 320px);
+      height: min(82vw, 320px);
       background-color: rgba(20, 15, 35, 0.85);
-      padding: 10px;
-      border-radius: 16px;
+      padding: 6px;
+      border-radius: 12px;
       margin: 0 auto;
-      box-shadow: 0 0 25px rgba(137, 180, 250, 0.15);
+      box-shadow: 0 0 20px rgba(137, 180, 250, 0.15);
       border: 1px solid rgba(255, 255, 255, 0.12);
-      touch-action: none;
     }
 
     .cell {
-      width: 42px;
-      height: 42px;
+      width: 100%;
+      height: 100%;
       background-color: rgba(10, 8, 20, 0.9);
-      border-radius: 8px;
+      border-radius: 4px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 20px;
+      font-size: clamp(12px, 4vw, 16px);
       position: relative;
     }
 
-    .cell.blocked {
-      background-color: #313244 !important;
-      border: 1px solid #45475a;
-      box-shadow: inset 0 0 8px #11111b;
-    }
-
-    /* Blok Bintang */
     .cell.has-star::after {
       content: '⭐';
-      font-size: 20px;
-      filter: drop-shadow(0 0 6px #f9e2af);
-      animation: starPulse 1.5s infinite ease-in-out;
+      filter: drop-shadow(0 0 4px #f9e2af);
     }
 
-    @keyframes starPulse {
-      0%, 100% { transform: scale(0.9); }
-      50% { transform: scale(1.1); }
-    }
-
-    /* Warna Planet */
-    .cell.filled.planet-mars { background: radial-gradient(circle at 35% 35%, #ff7b54, #ffb26b); box-shadow: 0 0 10px #ff7b54; }
-    .cell.filled.planet-earth { background: radial-gradient(circle at 35% 35%, #4ea8de, #48cae4); box-shadow: 0 0 10px #4ea8de; }
-    .cell.filled.planet-jupiter { background: radial-gradient(circle at 35% 35%, #f4a261, #e76f51); box-shadow: 0 0 10px #f4a261; }
-    .cell.filled.planet-neptune { background: radial-gradient(circle at 35% 35%, #b5e2fa, #0d3b66); box-shadow: 0 0 10px #b5e2fa; }
-    .cell.filled.planet-sun { background: radial-gradient(circle at 35% 35%, #ffe66d, #ff6b6b); box-shadow: 0 0 12px #ffe66d; }
+    .cell.filled.planet-mars { background: radial-gradient(circle at 35% 35%, #ff7b54, #ffb26b); }
+    .cell.filled.planet-earth { background: radial-gradient(circle at 35% 35%, #4ea8de, #48cae4); }
+    .cell.filled.planet-jupiter { background: radial-gradient(circle at 35% 35%, #f4a261, #e76f51); }
+    .cell.filled.planet-neptune { background: radial-gradient(circle at 35% 35%, #b5e2fa, #0d3b66); }
+    .cell.filled.planet-sun { background: radial-gradient(circle at 35% 35%, #ffe66d, #ff6b6b); }
 
     .cell.highlight {
-      background-color: rgba(137, 220, 235, 0.45) !important;
-      border: 2px dashed #89dceb !important;
+      background-color: rgba(137, 220, 235, 0.5) !important;
+      border: 1px dashed #89dceb !important;
     }
 
     .cell.highlight-invalid {
-      background-color: rgba(243, 139, 168, 0.45) !important;
-      border: 2px dashed #f38ba8 !important;
+      background-color: rgba(243, 139, 168, 0.5) !important;
+      border: 1px dashed #f38ba8 !important;
     }
 
     .shapes-container {
       display: flex;
-      justify-content: center;
-      gap: 15px;
-      margin-top: 20px;
-      min-height: 90px;
+      justify-content: space-around;
+      width: 100%;
+      margin-top: 10px;
+      min-height: 70px;
       align-items: center;
-      touch-action: none;
     }
 
     .shape-preview {
       display: grid;
       gap: 2px;
-      cursor: grab;
-      padding: 6px;
-      border-radius: 8px;
+      padding: 4px;
+      border-radius: 6px;
       background-color: rgba(255, 255, 255, 0.04);
       touch-action: none;
     }
 
     .shape-preview.dragging {
-      opacity: 0.8;
       position: fixed;
       pointer-events: none;
       z-index: 1000;
+      opacity: 0.9;
       transform: scale(1.1);
+      margin: 0 !important;
     }
 
-    .shape-cell { width: 18px; height: 18px; border-radius: 3px; }
+    .shape-cell { 
+      width: min(4.5vw, 16px); 
+      height: min(4.5vw, 16px); 
+      border-radius: 2px; 
+    }
     .shape-cell.planet-mars { background-color: #ff7b54; }
     .shape-cell.planet-earth { background-color: #4ea8de; }
     .shape-cell.planet-jupiter { background-color: #f4a261; }
@@ -290,41 +276,41 @@
       top: 0; left: 0; width: 100vw; height: 100vh;
       background-color: rgba(0, 0, 0, 0.85);
       display: flex; justify-content: center; align-items: center;
-      z-index: 999; backdrop-filter: blur(5px);
+      z-index: 999; backdrop-filter: blur(4px);
     }
     .modal.hidden { display: none; }
     .modal-content {
-      background: #1e1e2e; padding: 25px 35px; border-radius: 20px;
-      border: 2px solid #89b4fa; text-align: center; max-width: 300px;
+      background: #1e1e2e; padding: 20px; border-radius: 16px;
+      border: 1px solid #89b4fa; text-align: center; width: 85%; max-width: 280px;
     }
   </style>
 </head>
 <body>
 
-  <!-- 1. SCREEN: MENU UTAMA -->
+  <!-- 1. HOME SCREEN -->
   <div id="screen-home" class="app-screen active">
-    <div class="sponsor-badge">Sponsored by GALAXY LABS 🚀</div>
-    <h1 class="game-title">SOLAR BLAST</h1>
-    
-    <button class="menu-btn btn-classic" onclick="startClassicMode()">PLAY CLASSIC ♾️</button>
-    <button class="menu-btn btn-challenge" onclick="openChallengeMap()">CHALLENGE (1-100) 🎯</button>
-
+    <div>
+      <div class="sponsor-badge">Sponsored by GALAXY LABS 🚀</div>
+      <h1 class="game-title">SOLAR BLAST</h1>
+    </div>
+    <div style="width: 100%;">
+      <button class="menu-btn btn-classic" onclick="startClassicMode()">PLAY CLASSIC ♾️</button>
+      <button class="menu-btn btn-challenge" onclick="openChallengeMap()">CHALLENGE (1-100) 🎯</button>
+    </div>
     <div class="history-card">
       <h3>🏆 Riwayat Highscore</h3>
-      <ul id="history-list" class="history-list">
-        <!-- List History -->
-      </ul>
+      <ul id="history-list" class="history-list"></ul>
     </div>
   </div>
 
-  <!-- 2. SCREEN: PETA LEVEL CHALLENGE -->
+  <!-- 2. CHALLENGE LEVEL MAP -->
   <div id="screen-levels" class="app-screen">
     <button class="back-btn" onclick="showScreen('screen-home')">⬅ Kembali</button>
-    <h2>Pilih Level (1-100)</h2>
+    <h3 style="margin: 0 0 10px 0;">Pilih Level (1-100)</h3>
     <div id="level-grid" class="level-grid"></div>
   </div>
 
-  <!-- 3. SCREEN: GAMEPLAY -->
+  <!-- 3. GAMEPLAY SCREEN -->
   <div id="screen-game" class="app-screen">
     <button class="back-btn" onclick="exitGame()">⬅ Menu</button>
     
@@ -338,89 +324,72 @@
     <div id="shapes-container" class="shapes-container"></div>
   </div>
 
-  <!-- POPUP GAME OVER / LEVEL CLEAR -->
+  <!-- MODAL -->
   <div id="game-modal" class="modal hidden">
     <div class="modal-content">
-      <h2 id="modal-title">MISSION FAILED 🚀</h2>
-      <p id="modal-desc">Papan sudah penuh!</p>
+      <h3 id="modal-title" style="margin-top: 0;">MISSION FAILED 🚀</h3>
+      <p id="modal-desc" style="font-size: 13px;">Papan penuh!</p>
       <button class="menu-btn btn-classic" onclick="closeModalAndRedirect()">Lanjut 🔄</button>
     </div>
   </div>
 
   <script>
-    // === WEB AUDIO API (SFX SYNTHESIZER SPACE) ===
+    // WEB AUDIO API SYNTHESIZER
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
     function playSpaceBlastSFX(linesCleared = 1) {
       if (audioCtx.state === 'suspended') audioCtx.resume();
-
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
-
-      // Laser Sine Wave futuristik dengan sweeping pitch menurun
       osc.type = 'sine';
-      
       const now = audioCtx.currentTime;
-      const baseFreq = 300 + (linesCleared * 120); // Nada lebih tinggi jika pecah combo (banyak baris)
+      const baseFreq = 280 + (linesCleared * 100);
       
       osc.frequency.setValueAtTime(baseFreq, now);
-      osc.frequency.exponentialRampToValueAtTime(40, now + 0.35);
-
-      // Effect Fade-out halus
+      osc.frequency.exponentialRampToValueAtTime(35, now + 0.3);
       gain.gain.setValueAtTime(0.3, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
 
       osc.connect(gain);
       gain.connect(audioCtx.destination);
-
-      osc.start(now);
-      osc.stop(now + 0.35);
-    }
-
-    function playPlaceSFX() {
-      if (audioCtx.state === 'suspended') audioCtx.resume();
-
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      const now = audioCtx.currentTime;
-
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(150, now);
-      osc.frequency.exponentialRampToValueAtTime(80, now + 0.08);
-
-      gain.gain.setValueAtTime(0.2, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
-
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-
-      osc.start(now);
-      osc.stop(now + 0.08);
-    }
-
-    function playStarSFX() {
-      if (audioCtx.state === 'suspended') audioCtx.resume();
-
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      const now = audioCtx.currentTime;
-
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(523.25, now); // C5
-      osc.frequency.setValueAtTime(659.25, now + 0.08); // E5
-      osc.frequency.setValueAtTime(783.99, now + 0.16); // G5
-
-      gain.gain.setValueAtTime(0.25, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-
       osc.start(now);
       osc.stop(now + 0.3);
     }
 
-    // === GAME LOGIC ===
+    function playPlaceSFX() {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      const now = audioCtx.currentTime;
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(140, now);
+      osc.frequency.exponentialRampToValueAtTime(70, now + 0.07);
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.07);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(now);
+      osc.stop(now + 0.07);
+    }
+
+    function playStarSFX() {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      const now = audioCtx.currentTime;
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(523.25, now);
+      osc.frequency.setValueAtTime(659.25, now + 0.08);
+      osc.frequency.setValueAtTime(783.99, now + 0.16);
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.28);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(now);
+      osc.stop(now + 0.28);
+    }
+
+    // GAME VARIABLES
     const BOARD_SIZE = 8;
     let isChallengeMode = false;
     let currentLevel = 1;
@@ -440,8 +409,8 @@
     let draggedShape = null;
     let draggedShapeMatrix = null;
     let draggedPlanetClass = '';
-    let grabRowOffset = 0;
-    let grabColOffset = 0;
+    let touchOffsetX = 0;
+    let touchOffsetY = 0;
 
     const PLANET_CLASSES = ['planet-mars', 'planet-earth', 'planet-jupiter', 'planet-neptune', 'planet-sun'];
     const SHAPES = [
@@ -457,8 +426,7 @@
     }
 
     function saveHistory(finalScore, mode) {
-      const newRecord = { score: finalScore, mode: mode, date: new Date().toLocaleDateString('id-ID') };
-      highscoreHistory.unshift(newRecord);
+      highscoreHistory.unshift({ score: finalScore, mode: mode, date: new Date().toLocaleDateString('id-ID') });
       if(highscoreHistory.length > 5) highscoreHistory.pop();
       localStorage.setItem('solar_history', JSON.stringify(highscoreHistory));
     }
@@ -466,7 +434,7 @@
     function renderHistory() {
       const listElement = document.getElementById('history-list');
       listElement.innerHTML = highscoreHistory.length === 0 
-        ? '<li style="color: #6c7086;">Belum ada riwayat permainan</li>'
+        ? '<li style="color: #6c7086;">Belum ada riwayat</li>'
         : highscoreHistory.map(h => `<li class="history-item"><span>${h.mode}</span> <strong>${h.score} Poin</strong></li>`).join('');
     }
 
@@ -485,13 +453,9 @@
       for (let i = 1; i <= 100; i++) {
         const btn = document.createElement('button');
         btn.className = `level-btn ${i <= unlockedLevels ? 'unlocked' : ''}`;
-        btn.innerText = i;
-        if (i <= unlockedLevels) {
-          btn.onclick = () => startChallengeLevel(i);
-        } else {
-          btn.style.opacity = '0.4';
-          btn.innerText = '🔒';
-        }
+        btn.innerText = i <= unlockedLevels ? i : '🔒';
+        if (i <= unlockedLevels) btn.onclick = () => startChallengeLevel(i);
+        else btn.style.opacity = '0.4';
         grid.appendChild(btn);
       }
       showScreen('screen-levels');
@@ -508,8 +472,7 @@
     }
 
     function initGame() {
-      score = 0;
-      starsCollected = 0;
+      score = 0; starsCollected = 0;
       scoreElement.innerText = score;
       starCountElement.innerText = starsCollected;
       
@@ -517,22 +480,16 @@
         Array(BOARD_SIZE).fill(null).map(() => ({ type: null, planet: '', hasStar: false }))
       );
 
-      if (isChallengeMode) {
-        generateChallengeStars(currentLevel);
-      }
-
+      if (isChallengeMode) generateChallengeStars();
       createBoard();
       generateShapes();
     }
 
-    function generateChallengeStars(level) {
-      const starCount = 3 + Math.floor(Math.random() * 2);
+    function generateChallengeStars() {
       let placed = 0;
-
-      while(placed < starCount) {
+      while(placed < 3) {
         let r = Math.floor(Math.random() * BOARD_SIZE);
         let c = Math.floor(Math.random() * BOARD_SIZE);
-        
         if (!boardState[r][c].hasStar) {
           boardState[r][c].hasStar = true;
           placed++;
@@ -548,18 +505,10 @@
           cell.classList.add('cell');
           cell.dataset.row = r;
           cell.dataset.col = c;
-
-          if (boardState[r][c].hasStar) {
-            cell.classList.add('has-star');
-          }
-
+          if (boardState[r][c].hasStar) cell.classList.add('has-star');
           boardElement.appendChild(cell);
         }
       }
-
-      boardElement.addEventListener('dragover', handleGlobalDragOver);
-      boardElement.addEventListener('dragleave', clearHighlights);
-      boardElement.addEventListener('drop', handleDrop);
     }
 
     function generateShapes() {
@@ -575,106 +524,88 @@
     function renderShapePreview(shape, planetClass) {
       const container = document.createElement('div');
       container.classList.add('shape-preview');
-      container.setAttribute('draggable', 'true');
       container.dataset.shapeMatrix = JSON.stringify(shape);
       
       const cols = shape[0].length;
       container.style.display = 'grid';
-      container.style.gridTemplateColumns = `repeat(${cols}, 18px)`;
+      container.style.gridTemplateColumns = `repeat(${cols}, min(4.5vw, 16px))`;
 
-      shape.forEach((row, r) => {
-        row.forEach((val, c) => {
+      shape.forEach((row) => {
+        row.forEach((val) => {
           const cell = document.createElement('div');
           cell.classList.add('shape-cell');
-          if (val === 0) {
-            cell.classList.add('empty');
-          } else {
-            cell.classList.add(planetClass);
-            cell.addEventListener('mousedown', () => { grabRowOffset = r; grabColOffset = c; });
-          }
+          if (val === 0) cell.classList.add('empty');
+          else cell.classList.add(planetClass);
           container.appendChild(cell);
         });
       });
 
-      // Desktop
-      container.addEventListener('dragstart', (e) => {
-        draggedShape = container;
-        draggedShapeMatrix = shape;
-        draggedPlanetClass = planetClass;
-        e.dataTransfer.setData('text/plain', '');
-      });
-
-      // Touch Mobile
+      // KONTROL TOUCH PRESISI & STABIL UNTUK HP
       container.addEventListener('touchstart', (e) => {
         e.preventDefault();
         const touch = e.touches[0];
+        const rect = container.getBoundingClientRect();
         
         draggedShape = container;
         draggedShapeMatrix = shape;
         draggedPlanetClass = planetClass;
-        grabRowOffset = 0;
-        grabColOffset = 0;
+
+        // Tentukan offset jari agar blok berada sedikit di atas sentuhan telunjuk
+        touchOffsetX = rect.width / 2;
+        touchOffsetY = rect.height + 30; // Posisi melayang di atas jari agar terlihat jelas
 
         container.classList.add('dragging');
-        moveAt(touch.clientX, touch.clientY);
+        updateDragPosition(touch.clientX, touch.clientY);
       }, { passive: false });
-
-      container.addEventListener('touchmove', (e) => {
-        e.preventDefault();
-        if (!draggedShape) return;
-        const touch = e.touches[0];
-        moveAt(touch.clientX, touch.clientY);
-        handleTouchMove(touch.clientX, touch.clientY);
-      }, { passive: false });
-
-      container.addEventListener('touchend', (e) => {
-        if (!draggedShape) return;
-        const touch = e.changedTouches[0];
-        handleTouchEnd(touch.clientX, touch.clientY);
-      });
 
       shapesContainer.appendChild(container);
     }
 
-    function moveAt(pageX, pageY) {
+    window.addEventListener('touchmove', (e) => {
+      if (!draggedShape) return;
+      e.preventDefault();
+      const touch = e.touches[0];
+      updateDragPosition(touch.clientX, touch.clientY);
+      handleHover(touch.clientX, touch.clientY - touchOffsetY + 15);
+    }, { passive: false });
+
+    window.addEventListener('touchend', (e) => {
+      if (!draggedShape) return;
+      const touch = e.changedTouches[0];
+      handleDropAt(touch.clientX, touch.clientY - touchOffsetY + 15);
+    });
+
+    function updateDragPosition(x, y) {
       if (draggedShape) {
-        draggedShape.style.left = pageX - draggedShape.offsetWidth / 2 + 'px';
-        draggedShape.style.top = pageY - draggedShape.offsetHeight - 20 + 'px';
+        draggedShape.style.left = `${x - touchOffsetX}px`;
+        draggedShape.style.top = `${y - touchOffsetY}px`;
       }
     }
 
-    function handleTouchMove(clientX, clientY) {
+    function handleHover(clientX, clientY) {
       clearHighlights();
-      const el = document.elementFromPoint(clientX, clientY - 40);
+      const el = document.elementFromPoint(clientX, clientY);
       if (!el || !el.classList.contains('cell')) return;
 
-      const startRow = parseInt(el.dataset.row) - grabRowOffset;
-      const startCol = parseInt(el.dataset.col) - grabColOffset;
+      const r = parseInt(el.dataset.row);
+      const c = parseInt(el.dataset.col);
 
-      const isValid = canPlaceShape(draggedShapeMatrix, startRow, startCol);
-      highlightShape(draggedShapeMatrix, startRow, startCol, isValid);
+      const isValid = canPlaceShape(draggedShapeMatrix, r, c);
+      highlightShape(draggedShapeMatrix, r, c, isValid);
     }
 
-    function handleTouchEnd(clientX, clientY) {
+    function handleDropAt(clientX, clientY) {
       clearHighlights();
-      if (!draggedShape) return;
+      const el = document.elementFromPoint(clientX, clientY);
 
-      draggedShape.classList.remove('dragging');
-      draggedShape.style.position = '';
-      draggedShape.style.left = '';
-      draggedShape.style.top = '';
-
-      const el = document.elementFromPoint(clientX, clientY - 40);
       if (el && el.classList.contains('cell')) {
-        const startRow = parseInt(el.dataset.row) - grabRowOffset;
-        const startCol = parseInt(el.dataset.col) - grabColOffset;
+        const r = parseInt(el.dataset.row);
+        const c = parseInt(el.dataset.col);
 
-        if (canPlaceShape(draggedShapeMatrix, startRow, startCol)) {
-          placeShape(draggedShapeMatrix, startRow, startCol, draggedPlanetClass);
+        if (canPlaceShape(draggedShapeMatrix, r, c)) {
+          placeShape(draggedShapeMatrix, r, c, draggedPlanetClass);
           draggedShape.remove();
-          draggedShapeMatrix = null;
-          draggedShape = null;
-
+          resetDragState();
           checkAndClearLines();
 
           if (shapesContainer.children.length === 0) generateShapes();
@@ -682,29 +613,27 @@
           return;
         }
       }
+
+      // Revert Jika Drop Gagal
+      if (draggedShape) {
+        draggedShape.classList.remove('dragging');
+        draggedShape.style.position = '';
+        draggedShape.style.left = '';
+        draggedShape.style.top = '';
+      }
+      resetDragState();
+    }
+
+    function resetDragState() {
       draggedShape = null;
       draggedShapeMatrix = null;
+      draggedPlanetClass = '';
     }
 
     function clearHighlights() {
       document.querySelectorAll('.cell.highlight, .cell.highlight-invalid').forEach(cell => {
         cell.classList.remove('highlight', 'highlight-invalid');
       });
-    }
-
-    function handleGlobalDragOver(e) {
-      e.preventDefault();
-      if (!draggedShapeMatrix) return;
-      clearHighlights();
-
-      const el = document.elementFromPoint(e.clientX, e.clientY);
-      if (!el || !el.classList.contains('cell')) return;
-
-      const startRow = parseInt(el.dataset.row) - grabRowOffset;
-      const startCol = parseInt(el.dataset.col) - grabColOffset;
-
-      const isValid = canPlaceShape(draggedShapeMatrix, startRow, startCol);
-      highlightShape(draggedShapeMatrix, startRow, startCol, isValid);
     }
 
     function highlightShape(shape, startRow, startCol, isValid) {
@@ -716,29 +645,6 @@
             if (cell) cell.classList.add(cls);
           }
         }
-      }
-    }
-
-    function handleDrop(e) {
-      e.preventDefault();
-      clearHighlights();
-      if (!draggedShapeMatrix) return;
-
-      const el = document.elementFromPoint(e.clientX, e.clientY);
-      if (!el || !el.classList.contains('cell')) return;
-
-      const startRow = parseInt(el.dataset.row) - grabRowOffset;
-      const startCol = parseInt(el.dataset.col) - grabColOffset;
-
-      if (canPlaceShape(draggedShapeMatrix, startRow, startCol)) {
-        placeShape(draggedShapeMatrix, startRow, startCol, draggedPlanetClass);
-        draggedShape.remove();
-        draggedShapeMatrix = null;
-
-        checkAndClearLines();
-
-        if (shapesContainer.children.length === 0) generateShapes();
-        else checkGameOver();
       }
     }
 
@@ -771,7 +677,7 @@
           }
         }
       }
-      playPlaceSFX(); // Sound Effect Pas Pasang Block
+      playPlaceSFX();
       score += count;
       scoreElement.innerText = score;
     }
@@ -802,12 +708,8 @@
 
       const totalLinesCleared = rowsToClear.length + colsToClear.length;
 
-      // Jalankan Sound Effect Pecah
-      if (totalLinesCleared > 0) {
-        playSpaceBlastSFX(totalLinesCleared);
-      }
+      if (totalLinesCleared > 0) playSpaceBlastSFX(totalLinesCleared);
 
-      // Proses Reset Kotak
       cellsToReset.forEach(coord => {
         const [r, c] = coord.split(',').map(Number);
         
@@ -822,14 +724,10 @@
         boardState[r][c].planet = '';
 
         const cell = boardElement.querySelector(`[data-row="${r}"][data-col="${c}"]`);
-        if (cell) {
-          cell.className = 'cell';
-        }
+        if (cell) cell.className = 'cell';
       });
 
-      if (starCleared) {
-        playStarSFX(); // SFX Khusus saat Bintang Didapat
-      }
+      if (starCleared) playStarSFX();
 
       if (totalLinesCleared > 0) {
         score += totalLinesCleared * 100;
@@ -841,7 +739,7 @@
           unlockedLevels++;
           localStorage.setItem('solar_unlocked_level', unlockedLevels);
         }
-        showModal("LEVEL COMPLETED! ⭐", `Selamat! Kamu berhasil mengumpulkan 3 Bintang di Level ${currentLevel}!`);
+        showModal("LEVEL COMPLETED! ⭐", `Selamat! Kamu meraih 3 Bintang di Level ${currentLevel}!`);
       }
     }
 
@@ -861,7 +759,7 @@
 
       if (!canPlace) {
         if (!isChallengeMode) saveHistory(score, 'Classic');
-        showModal("MISSION FAILED 🚀", isChallengeMode ? `Kamu gagal mengumpulkan 3 Bintang! (${starsCollected}/3 ⭐)` : `Tidak ada ruang tersisa! Skor Akhir: ${score}`);
+        showModal("MISSION FAILED 🚀", isChallengeMode ? `Gagal mengumpulkan bintang! (${starsCollected}/3 ⭐)` : `Papan Penuh! Skor Akhir: ${score}`);
       }
     }
 
