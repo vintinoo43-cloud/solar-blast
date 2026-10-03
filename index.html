@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solar Blast App</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      user-select: none;
+    }
+
+    body {
+      background: radial-gradient(circle at center, #1b0a2a 0%, #08020f 70%, #020005 100%);
+      color: #ffffff;
+      font-family: 'Segoe UI', Roboto, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      overflow-x: hidden;
+    }
+
+    .app-screen {
+      display: none;
+      width: 100%;
+      max-width: 420px;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .app-screen.active {
+      display: flex;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    /* === 1. MENU UTAMA (HOME) === */
+    .sponsor-badge {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      letter-spacing: 1.5px;
+      color: #f9e2af;
+      margin-bottom: 15px;
+      text-transform: uppercase;
+    }
+
+    h1.game-title {
+      font-size: 38px;
+      letter-spacing: 4px;
+      color: #f5c2e7;
+      text-shadow: 0 0 15px rgba(245, 194, 231, 0.6), 0 0 30px rgba(203, 166, 247, 0.4);
+      margin: 0 0 25px 0;
+    }
+
+    .menu-btn {
+      width: 100%;
+      padding: 16px;
+      margin: 10px 0;
+      font-size: 18px;
+      font-weight: bold;
+      border: none;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-classic {
+      background: linear-gradient(45deg, #89b4fa, #b4befe);
+      color: #11111b;
+      box-shadow: 0 4px 15px rgba(137, 180, 250, 0.4);
+    }
+
+    .btn-challenge {
+      background: linear-gradient(45deg, #f5c2e7, #cba6f7);
+      color: #11111b;
+      box-shadow: 0 4px 15px rgba(245, 194, 231, 0.4);
+    }
+
+    .menu-btn:hover {
+      transform: translateY(-2px);
+    }
+
+    /* History / Highscore Container */
+    .history-card {
+      width: 100%;
+      background: rgba(20, 15, 35, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      padding: 15px;
+      margin-top: 25px;
+    }
+
+    .history-card h3 {
+      margin: 0 0 10px 0;
+      font-size: 16px;
+      color: #89dceb;
+    }
+
+    .history-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      max-height: 120px;
+      overflow-y: auto;
+    }
+
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 10px;
+      font-size: 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    /* === 2. PETA LEVEL CHALLENGE === */
+    .level-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      max-height: 380px;
+      overflow-y: auto;
+      width: 100%;
+      padding: 10px;
+      background: rgba(20, 15, 35, 0.85);
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .level-btn {
+      aspect-ratio: 1;
+      background: #313244;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #cdd6f4;
+      font-weight: bold;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .level-btn.unlocked {
+      background: linear-gradient(135deg, #a6e3a1, #94e2d5);
+      color: #11111b;
+      box-shadow: 0 0 10px rgba(166, 227, 161, 0.3);
+    }
+
+    .level-btn.completed {
+      background: #89b4fa;
+      color: #11111b;
+    }
+
+    .back-btn {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      margin-bottom: 15px;
+      align-self: flex-start;
+    }
+
+    /* === 3. GAMEPLAY (CLASSIC & CHALLENGE) === */
+    .score-container {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+
+    .score-box {
+      font-size: 16px;
+      font-weight: bold;
+      color: #89dceb;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid rgba(137, 220, 235, 0.2);
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(8, 42px);
+      grid-template-rows: repeat(8, 42px);
+      gap: 4px;
+      background-color: rgba(20, 15, 35, 0.85);
+      padding: 10px;
+      border-radius: 16px;
+      margin: 0 auto;
+      box-shadow: 0 0 25px rgba(137, 180, 250, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .cell {
+      width: 42px;
+      height: 42px;
+      background-color: rgba(10, 8, 20, 0.9);
+      border-radius: 8px;
+    }
+
+    /* Blok Rintangan / Blok Terkunci di Mode Challenge */
+    .cell.blocked {
+      background-color: #313244 !important;
+      border: 1px solid #45475a;
+      box-shadow: inset 0 0 8px #11111b;
+    }
+
+    /* Warna Planet */
+    .cell.filled.planet-mars { background: radial-gradient(circle at 35% 35%, #ff7b54, #ffb26b); box-shadow: 0 0 10px #ff7b54; }
+    .cell.filled.planet-earth { background: radial-gradient(circle at 35% 35%, #4ea8de, #48cae4); box-shadow: 0 0 10px #4ea8de; }
+    .cell.filled.planet-jupiter { background: radial-gradient(circle at 35% 35%, #f4a261, #e76f51); box-shadow: 0 0 10px #f4a261; }
+    .cell.filled.planet-neptune { background: radial-gradient(circle at 35% 35%, #b5e2fa, #0d3b66); box-shadow: 0 0 10px #b5e2fa; }
+    .cell.filled.planet-sun { background: radial-gradient(circle at 35% 35%, #ffe66d, #ff6b6b); box-shadow: 0 0 12px #ffe66d; }
+
+    .cell.highlight {
+      background-color: rgba(137, 220, 235, 0.45) !important;
+      border: 2px dashed #89dceb !important;
+    }
+
+    .cell.highlight-invalid {
+      background-color: rgba(243, 139, 168, 0.45) !important;
+      border: 2px dashed #f38ba8 !important;
+    }
+
+    .shapes-container {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 20px;
+      min-height: 90px;
+      align-items: center;
+    }
+
+    .shape-preview {
+      display: grid;
+      gap: 2px;
+      cursor: grab;
+      padding: 6px;
+      border-radius: 8px;
+      background-color: rgba(255, 255, 255, 0.04);
+    }
+
+    .shape-cell { width: 18px; height: 18px; border-radius: 3px; }
+    .shape-cell.planet-mars { background-color: #ff7b54; }
+    .shape-cell.planet-earth { background-color: #4ea8de; }
+    .shape-cell.planet-jupiter { background-color: #f4a261; }
+    .shape-cell.planet-neptune { background-color: #b5e2fa; }
+    .shape-cell.planet-sun { background-color: #ffe66d; }
+    .shape-cell.empty { background-color: transparent !important; }
+
+    /* Modal Popup */
+    .modal {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background-color: rgba(0, 0, 0, 0.85);
+      display: flex; justify-content: center; align-items: center;
+      z-index: 999; backdrop-filter: blur(5px);
+    }
+    .modal.hidden { display: none; }
+    .modal-content {
+      background: #1e1e2e; padding: 25px 35px; border-radius: 20px;
+      border: 2px solid #89b4fa; text-align: center; max-width: 300px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. SCREEN: MENU UTAMA -->
+  <div id="screen-home" class="app-screen active">
+    <div class="sponsor-badge">Sponsored by GALAXY LABS 🚀</div>
+    <h1 class="game-title">SOLAR BLAST</h1>
+    
+    <button class="menu-btn btn-classic" onclick="startClassicMode()">PLAY CLASSIC ♾️</button>
+    <button class="menu-btn btn-challenge" onclick="openChallengeMap()">CHALLENGE (1-100) 🎯</button>
+
+    <div class="history-card">
+      <h3>🏆 Riwayat Highscore</h3>
+      <ul id="history-list" class="history-list">
+        <!-- List History -->
+      </ul>
+    </div>
+  </div>
+
+  <!-- 2. SCREEN: PETA LEVEL CHALLENGE -->
+  <div id="screen-levels" class="app-screen">
+    <button class="back-btn" onclick="showScreen('screen-home')">⬅ Kembali</button>
+    <h2>Pilih Level (1-100)</h2>
+    <div id="level-grid" class="level-grid"></div>
+  </div>
+
+  <!-- 3. SCREEN: GAMEPLAY (CLASSIC & CHALLENGE) -->
+  <div id="screen-game" class="app-screen">
+    <button class="back-btn" onclick="exitGame()">⬅ Menu</button>
+    
+    <div class="score-container">
+      <div class="score-box" id="level-indicator">Classic</div>
+      <div class="score-box">Skor: <span id="score">0</span></div>
+    </div>
+
+    <div id="board" class="board"></div>
+    <div id="shapes-container" class="shapes-container"></div>
+  </div>
+
+  <!-- POPUP GAME OVER / LEVEL CLEAR -->
+  <div id="game-modal" class="modal hidden">
+    <div class="modal-content">
+      <h2 id="modal-title">MISSION FAILED 🚀</h2>
+      <p id="modal-desc">Papan sudah penuh!</p>
+      <button class="menu-btn btn-classic" onclick="closeModalAndRedirect()">Lanjut 🔄</button>
+    </div>
+  </div>
+
+  <script>
+    const BOARD_SIZE = 8;
+    let isChallengeMode = false;
+    let currentLevel = 1;
+    let score = 0;
+    
+    let boardState = Array(BOARD_SIZE).fill(null).map(() => Array(BOARD_SIZE).fill(null));
+    let unlockedLevels = parseInt(localStorage.getItem('solar_unlocked_level')) || 1;
+    let highscoreHistory = JSON.parse(localStorage.getItem('solar_history')) || [];
+
+    const boardElement = document.getElementById('board');
+    const scoreElement = document.getElementById('score');
+    const shapesContainer = document.getElementById('shapes-container');
+
+    let draggedShape = null;
+    let draggedShapeMatrix = null;
+    let draggedPlanetClass = '';
+    let grabRowOffset = 0;
+    let grabColOffset = 0;
+
+    const PLANET_CLASSES = ['planet-mars', 'planet-earth', 'planet-jupiter', 'planet-neptune', 'planet-sun'];
+    const SHAPES = [
+      [[1]], [[1, 1]], [[1], [1]], [[1, 1], [1, 1]],
+      [[1, 1, 1]], [[1], [1], [1]], [[1, 1, 1], [1, 1, 1], [1, 1, 1]],
+      [[1, 0], [1, 0], [1, 1]], [[0, 1], [0, 1], [1, 1]]
+    ];
+
+    // ROUTING / NAVIGASI LAYAR
+    function showScreen(screenId) {
+      document.querySelectorAll('.app-screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(screenId).classList.add('active');
+      if(screenId === 'screen-home') renderHistory();
+    }
+
+    // HISTORY HIGH SCORE
+    function saveHistory(finalScore, mode) {
+      const newRecord = { score: finalScore, mode: mode, date: new Date().toLocaleDateString('id-ID') };
+      highscoreHistory.unshift(newRecord);
+      if(highscoreHistory.length > 5) highscoreHistory.pop();
+      localStorage.setItem('solar_history', JSON.stringify(highscoreHistory));
+    }
+
+    function renderHistory() {
+      const listElement = document.getElementById('history-list');
+      listElement.innerHTML = highscoreHistory.length === 0 
+        ? '<li style="color: #6c7086;">Belum ada riwayat permainan</li>'
+        : highscoreHistory.map(h => `<li class="history-item"><span>${h.mode}</span> <strong>${h.score} Poin</strong></li>`).join('');
+    }
+
+    // MODE CLASSIC
+    function startClassicMode() {
+      isChallengeMode = false;
+      document.getElementById('level-indicator').innerText = 'Classic Mode';
+      initGame();
+      showScreen('screen-game');
+    }
+
+    // MODE CHALLENGE
+    function openChallengeMap() {
+      const grid = document.getElementById('level-grid');
+      grid.innerHTML = '';
+      for (let i = 1; i <= 100; i++) {
+        const btn = document.createElement('button');
+        btn.className = `level-btn ${i <= unlockedLevels ? 'unlocked' : ''}`;
+        btn.innerText = i;
+        if (i <= unlockedLevels) {
+          btn.onclick = () => startChallengeLevel(i);
+        } else {
+          btn.style.opacity = '0.4';
+          btn.innerText = '🔒';
+        }
+        grid.appendChild(btn);
+      }
+      showScreen('screen-levels');
+    }
+
+    function startChallengeLevel(level) {
+      isChallengeMode = true;
+      currentLevel = level;
+      document.getElementById('level-indicator').innerText = `Level ${level}`;
+      initGame();
+      showScreen('screen-game');
+    }
+
+    // INISIALISASI GAMEBOARD
+    function initGame() {
+      score = 0;
+      scoreElement.innerText = score;
+      boardState = Array(BOARD_SIZE).fill(null).map(() => Array(BOARD_SIZE).fill(null));
+
+      // Buat Rintangan/Bentuk Papan Unik untuk Mode Challenge
+      if (isChallengeMode) {
+        generateChallengeObstacles(currentLevel);
+      }
+
+      createBoard();
+      generateShapes();
+    }
+
+    // BENTUK PAPAN BERBEDA PADA SETIAP LEVEL (1-100)
+    function generateChallengeObstacles(level) {
+      // Menggunakan rumus matematika sederhana untuk menghasilkan variasi bentuk unik di tiap level
+      const obstacleCount = Math.min(4 + Math.floor(level / 5), 24); 
+      let placed = 0;
+      
+      while(placed < obstacleCount) {
+        let r = (level * 3 + placed * 7) % BOARD_SIZE;
+        let c = (level * 5 + placed * 3) % BOARD_SIZE;
+        
+        if (boardState[r][c] === null) {
+          boardState[r][c] = 'blocked'; // Petak terkunci / tidak bisa diisi
+          placed++;
+        }
+      }
+    }
+
+    function createBoard() {
+      boardElement.innerHTML = '';
+      for (let r = 0; r < BOARD_SIZE; r++) {
+        for (let c = 0; c < BOARD_SIZE; c++) {
+          const cell = document.createElement('div');
+          cell.classList.add('cell');
+          cell.dataset.row = r;
+          cell.dataset.col = c;
+
+          if (boardState[r][c] === 'blocked') {
+            cell.classList.add('blocked');
+          }
+
+          boardElement.appendChild(cell);
+        }
+      }
+
+      boardElement.addEventListener('dragover', handleGlobalDragOver);
+      boardElement.addEventListener('dragleave', clearHighlights);
+      boardElement.addEventListener('drop', handleDrop);
+    }
+
+    function generateShapes() {
+      shapesContainer.innerHTML = '';
+      for (let i = 0; i < 3; i++) {
+        const randomShape = SHAPES[Math.floor(Math.random() * SHAPES.length)];
+        const randomPlanet = PLANET_CLASSES[Math.floor(Math.random() * PLANET_CLASSES.length)];
+        renderShapePreview(randomShape, randomPlanet);
+      }
+      checkGameOver();
+    }
+
+    function renderShapePreview(shape, planetClass) {
+      const container = document.createElement('div');
+      container.classList.add('shape-preview');
+      container.setAttribute('draggable', 'true');
+      container.dataset.shapeMatrix = JSON.stringify(shape);
+      
+      const cols = shape[0].length;
+      container.style.display = 'grid';
+      container.style.gridTemplateColumns = `repeat(${cols}, 18px)`;
+
+      shape.forEach((row, r) => {
+        row.forEach((val, c) => {
+          const cell = document.createElement('div');
+          cell.classList.add('shape-cell');
+          if (val === 0) {
+            cell.classList.add('empty');
+          } else {
+            cell.classList.add(planetClass);
+            cell.addEventListener('mousedown', () => { grabRowOffset = r; grabColOffset = c; });
+          }
+          container.appendChild(cell);
+        });
+      });
+
+      container.addEventListener('dragstart', (e) => {
+        draggedShape = container;
+        draggedShapeMatrix = shape;
+        draggedPlanetClass = planetClass;
+        e.dataTransfer.setData('text/plain', '');
+      });
+
+      shapesContainer.appendChild(container);
+    }
+
+    function clearHighlights() {
+      document.querySelectorAll('.cell.highlight, .cell.highlight-invalid').forEach(cell => {
+        cell.classList.remove('highlight', 'highlight-invalid');
+      });
+    }
+
+    function handleGlobalDragOver(e) {
+      e.preventDefault();
+      if (!draggedShapeMatrix) return;
+      clearHighlights();
+
+      const el = document.elementFromPoint(e.clientX, e.clientY);
+      if (!el || !el.classList.contains('cell')) return;
+
+      const startRow = parseInt(el.dataset.row) - grabRowOffset;
+      const startCol = parseInt(el.dataset.col) - grabColOffset;
+
+      const isValid = canPlaceShape(draggedShapeMatrix, startRow, startCol);
+      highlightShape(draggedShapeMatrix, startRow, startCol, isValid);
+    }
+
+    function highlightShape(shape, startRow, startCol, isValid) {
+      const cls = isValid ? 'highlight' : 'highlight-invalid';
+      for (let r = 0; r < shape.length; r++) {
+        for (let c = 0; c < shape[r].length; c++) {
+          if (shape[r][c] === 1) {
+            const cell = boardElement.querySelector(`[data-row="${startRow + r}"][data-col="${startCol + c}"]`);
+            if (cell) cell.classList.add(cls);
+          }
+        }
+      }
+    }
+
+    function handleDrop(e) {
+      e.preventDefault();
+      clearHighlights();
+      if (!draggedShapeMatrix) return;
+
+      const el = document.elementFromPoint(e.clientX, e.clientY);
+      if (!el || !el.classList.contains('cell')) return;
+
+      const startRow = parseInt(el.dataset.row) - grabRowOffset;
+      const startCol = parseInt(el.dataset.col) - grabColOffset;
+
+      if (canPlaceShape(draggedShapeMatrix, startRow, startCol)) {
+        placeShape(draggedShapeMatrix, startRow, startCol, draggedPlanetClass);
+        draggedShape.remove();
+        draggedShapeMatrix = null;
+
+        checkAndClearLines();
+        checkChallengeWin();
+
+        if (shapesContainer.children.length === 0) generateShapes();
+        else checkGameOver();
+      }
+    }
+
+    function canPlaceShape(shape, startRow, startCol) {
+      for (let r = 0; r < shape.length; r++) {
+        for (let c = 0; c < shape[r].length; c++) {
+          if (shape[r][c] === 1) {
+            const tr = startRow + r, tc = startCol + c;
+            if (tr < 0 || tr >= BOARD_SIZE || tc < 0 || tc >= BOARD_SIZE || boardState[tr][tc] !== null) {
+              return false;
+            }
+          }
+        }
+      }
+      return true;
+    }
+
+    function placeShape(shape, startRow, startCol, planetClass) {
+      let count = 0;
+      for (let r = 0; r < shape.length; r++) {
+        for (let c = 0; c < shape[r].length; c++) {
+          if (shape[r][c] === 1) {
+            const tr = startRow + r, tc = startCol + c;
+            boardState[tr][tc] = planetClass;
+            count++;
+            const cell = boardElement.querySelector(`[data-row="${tr}"][data-col="${tc}"]`);
+            if (cell) cell.classList.add('filled', planetClass);
+          }
+        }
+      }
+      score += count;
+      scoreElement.innerText = score;
+    }
+
+    function checkAndClearLines() {
+      let rows = [], cols = [];
+      for (let r = 0; r < BOARD_SIZE; r++) {
+        if (boardState[r].every(v => v !== null && v !== 'blocked')) rows.push(r);
+      }
+      for (let c = 0; c < BOARD_SIZE; c++) {
+        let full = true;
+        for (let r = 0; r < BOARD_SIZE; r++) {
+          if (boardState[r][c] === null || boardState[r][c] === 'blocked') full = false;
+        }
+        if (full) cols.push(c);
+      }
+
+      rows.forEach(r => {
+        for (let c = 0; c < BOARD_SIZE; c++) {
+          if (boardState[r][c] !== 'blocked') {
+            boardState[r][c] = null;
+            const cell = boardElement.querySelector(`[data-row="${r}"][data-col="${c}"]`);
+            if (cell) cell.className = 'cell';
+          }
+        }
+      });
+
+      cols.forEach(c => {
+        for (let r = 0; r < BOARD_SIZE; r++) {
+          if (boardState[r][c] !== 'blocked') {
+            boardState[r][c] = null;
+            const cell = boardElement.querySelector(`[data-row="${r}"][data-col="${c}"]`);
+            if (cell) cell.className = 'cell';
+          }
+        }
+      });
+
+      if (rows.length + cols.length > 0) {
+        score += (rows.length + cols.length) * 100;
+        scoreElement.innerText = score;
+      }
+    }
+
+    // PENGECEKAN MENANG LEVEL CHALLENGE (PAPAN PENUH)
+    function checkChallengeWin() {
+      if (!isChallengeMode) return;
+
+      let isFull = true;
+      for (let r = 0; r < BOARD_SIZE; r++) {
+        for (let c = 0; c < BOARD_SIZE; c++) {
+          if (boardState[r][c] === null) {
+            isFull = false;
+            break;
+          }
+        }
+      }
+
+      if (isFull) {
+        if (currentLevel === unlockedLevels && unlockedLevels < 100) {
+          unlockedLevels++;
+          localStorage.setItem('solar_unlocked_level', unlockedLevels);
+        }
+        showModal("LEVEL COMPLETED! 🎉", `Selamat! Kamu berhasil memenuhi papan Level ${currentLevel}!`);
+      }
+    }
+
+    function checkGameOver() {
+      const previews = shapesContainer.querySelectorAll('.shape-preview');
+      if (previews.length === 0) return;
+
+      let canPlace = false;
+      previews.forEach(p => {
+        const matrix = JSON.parse(p.dataset.shapeMatrix);
+        for (let r = 0; r < BOARD_SIZE; r++) {
+          for (let c = 0; c < BOARD_SIZE; c++) {
+            if (canPlaceShape(matrix, r, c)) canPlace = true;
+          }
+        }
+      });
+
+      if (!canPlace) {
+        saveHistory(score, isChallengeMode ? `Level ${currentLevel}` : 'Classic');
+        showModal("MISSION FAILED 🚀", `Tidak ada ruang tersisa! Skor Akhir: ${score}`);
+      }
+    }
+
+    function showModal(title, desc) {
+      document.getElementById('modal-title').innerText = title;
+      document.getElementById('modal-desc').innerText = desc;
+      document.getElementById('game-modal').classList.remove('hidden');
+    }
+
+    function closeModalAndRedirect() {
+      document.getElementById('game-modal').classList.add('hidden');
+      if (isChallengeMode) openChallengeMap();
+      else showScreen('screen-home');
+    }
+
+    function exitGame() {
+      if (score > 0) saveHistory(score, isChallengeMode ? `Level ${currentLevel}` : 'Classic');
+      showScreen('screen-home');
+    }
+
+    // Jalankan awal
+    renderHistory();
+  </script>
+</body>
+</html>
