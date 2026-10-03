@@ -9,44 +9,43 @@
       box-sizing: border-box;
       user-select: none;
       -webkit-user-select: none;
-      touch-action: none; /* Mencegah geser/zoom layar di HP */
+      touch-action: none;
     }
 
     body {
       background: radial-gradient(circle at center, #1b0a2a 0%, #08020f 70%, #020005 100%);
       color: #ffffff;
-      font-family: 'Segoe UI', Roboto, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
+      height: 100vh;
       margin: 0;
-      padding: 10px;
+      padding: 0;
       overflow: hidden;
     }
 
-    /* Container dengan simulasi & batas rasio layar HP 20:9 */
+    /* Container Utama Mengikuti Ukuran & Proporsi Layar HP Standar */
     .app-screen {
       display: none;
-      width: 100%;
-      max-width: 380px;
+      width: 100vw;
+      max-width: 420px;
       height: 100vh;
-      max-height: 820px;
-      aspect-ratio: 9 / 20;
+      max-height: 900px;
       flex-direction: column;
       align-items: center;
-      text-align: center;
       justify-content: space-between;
-      padding: 12px 6px;
+      padding: clamp(10px, 3vh, 20px) 16px;
+      box-sizing: border-box;
     }
 
     .app-screen.active {
       display: flex;
-      animation: fadeIn 0.3s ease-in-out;
+      animation: fadeIn 0.25s ease-out;
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.95); }
+      from { opacity: 0; transform: scale(0.98); }
       to { opacity: 1; transform: scale(1); }
     }
 
@@ -54,58 +53,58 @@
     .sponsor-badge {
       background: rgba(255, 255, 255, 0.08);
       border: 1px solid rgba(255, 255, 255, 0.15);
-      padding: 4px 12px;
+      padding: 6px 14px;
       border-radius: 20px;
-      font-size: 11px;
+      font-size: 12px;
       letter-spacing: 1px;
       color: #f9e2af;
-      margin-bottom: 8px;
+      margin-bottom: 12px;
       text-transform: uppercase;
     }
 
     h1.game-title {
-      font-size: clamp(26px, 7.5vw, 34px);
+      font-size: clamp(32px, 8vw, 42px);
+      font-weight: 900;
       letter-spacing: 2px;
       color: #f5c2e7;
-      text-shadow: 0 0 15px rgba(245, 194, 231, 0.6);
-      margin: 0 0 10px 0;
+      text-shadow: 0 0 20px rgba(245, 194, 231, 0.6);
+      margin: 0 0 15px 0;
     }
 
     .menu-btn {
       width: 100%;
-      padding: 12px;
-      margin: 6px 0;
-      font-size: 15px;
-      font-weight: bold;
+      padding: 14px;
+      margin: 8px 0;
+      font-size: 16px;
+      font-weight: 800;
       border: none;
-      border-radius: 12px;
+      border-radius: 14px;
       cursor: pointer;
     }
 
     .btn-classic {
       background: linear-gradient(45deg, #89b4fa, #b4befe);
       color: #11111b;
-      box-shadow: 0 4px 12px rgba(137, 180, 250, 0.3);
+      box-shadow: 0 6px 16px rgba(137, 180, 250, 0.35);
     }
 
     .btn-challenge {
       background: linear-gradient(45deg, #f5c2e7, #cba6f7);
       color: #11111b;
-      box-shadow: 0 4px 12px rgba(245, 194, 231, 0.3);
+      box-shadow: 0 6px 16px rgba(245, 194, 231, 0.35);
     }
 
     .history-card {
       width: 100%;
       background: rgba(20, 15, 35, 0.85);
       border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 12px;
-      padding: 10px;
-      margin-top: 10px;
+      border-radius: 16px;
+      padding: 12px;
     }
 
     .history-card h3 {
-      margin: 0 0 6px 0;
-      font-size: 13px;
+      margin: 0 0 8px 0;
+      font-size: 14px;
       color: #89dceb;
     }
 
@@ -113,15 +112,15 @@
       list-style: none;
       padding: 0;
       margin: 0;
-      max-height: 100px;
+      max-height: 120px;
       overflow-y: auto;
     }
 
     .history-item {
       display: flex;
       justify-content: space-between;
-      padding: 4px 6px;
-      font-size: 12px;
+      padding: 6px 8px;
+      font-size: 13px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
 
@@ -129,13 +128,13 @@
     .level-grid {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
-      gap: 6px;
-      max-height: 60vh;
+      gap: 8px;
+      max-height: 65vh;
       overflow-y: auto;
       width: 100%;
-      padding: 6px;
+      padding: 8px;
       background: rgba(20, 15, 35, 0.85);
-      border-radius: 12px;
+      border-radius: 16px;
       border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
@@ -145,8 +144,8 @@
       border: 1px solid rgba(255, 255, 255, 0.1);
       color: #cdd6f4;
       font-weight: bold;
-      border-radius: 6px;
-      font-size: 12px;
+      border-radius: 8px;
+      font-size: 13px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -158,116 +157,124 @@
     }
 
     .back-btn {
-      background: transparent;
-      border: 1px solid rgba(255, 255, 255, 0.3);
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
       color: #fff;
-      padding: 6px 12px;
-      border-radius: 8px;
-      font-size: 12px;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
       align-self: flex-start;
     }
 
-    /* === 3. GAMEPLAY (RASIO TAMPILAN OPTIMAL HP 20:9) === */
+    /* === 3. GAMEPLAY (LAYOUT BLOCK BLAST RESMI) === */
+    .header-game {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
     .score-container {
       display: flex;
-      justify-content: center;
       gap: 10px;
-      margin: 8px 0;
-      width: 100%;
     }
 
     .score-box {
-      font-size: 13px;
-      font-weight: bold;
+      font-size: 14px;
+      font-weight: 700;
       color: #89dceb;
-      background: rgba(255, 255, 255, 0.05);
-      padding: 5px 12px;
-      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.08);
+      padding: 6px 14px;
+      border-radius: 12px;
       border: 1px solid rgba(137, 220, 235, 0.2);
     }
 
-    /* Papan Game Fleksibel Mengikuti Tinggi & Lebar Layar */
+    /* Ukuran Papan Block Blast Besar & Presisi Layar HP */
     .board {
       display: grid;
       grid-template-columns: repeat(8, 1fr);
       grid-template-rows: repeat(8, 1fr);
-      gap: 3px;
-      width: min(76vw, 36vh);
-      height: min(76vw, 36vh);
-      max-width: 310px;
-      max-height: 310px;
-      background-color: rgba(20, 15, 35, 0.85);
-      padding: 5px;
-      border-radius: 12px;
-      margin: 0 auto;
-      box-shadow: 0 0 15px rgba(137, 180, 250, 0.15);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      gap: 4px;
+      width: min(90vw, 360px);
+      height: min(90vw, 360px);
+      background-color: rgba(25, 20, 42, 0.95);
+      padding: 8px;
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(255, 255, 255, 0.05);
+      border: 2px solid rgba(255, 255, 255, 0.1);
     }
 
     .cell {
       width: 100%;
       height: 100%;
-      background-color: rgba(10, 8, 20, 0.9);
-      border-radius: 3px;
+      background-color: rgba(12, 10, 24, 0.85);
+      border-radius: 6px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: clamp(10px, 3.5vw, 15px);
+      font-size: 18px;
       position: relative;
     }
 
     .cell.has-star::after {
       content: '⭐';
-      filter: drop-shadow(0 0 3px #f9e2af);
+      filter: drop-shadow(0 0 4px #f9e2af);
     }
 
-    .cell.filled.planet-mars { background: radial-gradient(circle at 35% 35%, #ff7b54, #ffb26b); }
-    .cell.filled.planet-earth { background: radial-gradient(circle at 35% 35%, #4ea8de, #48cae4); }
-    .cell.filled.planet-jupiter { background: radial-gradient(circle at 35% 35%, #f4a261, #e76f51); }
-    .cell.filled.planet-neptune { background: radial-gradient(circle at 35% 35%, #b5e2fa, #0d3b66); }
-    .cell.filled.planet-sun { background: radial-gradient(circle at 35% 35%, #ffe66d, #ff6b6b); }
+    .cell.filled.planet-mars { background: linear-gradient(135deg, #ff7b54, #ff5252); }
+    .cell.filled.planet-earth { background: linear-gradient(135deg, #4ea8de, #0077b6); }
+    .cell.filled.planet-jupiter { background: linear-gradient(135deg, #f4a261, #e76f51); }
+    .cell.filled.planet-neptune { background: linear-gradient(135deg, #b5e2fa, #48cae4); }
+    .cell.filled.planet-sun { background: linear-gradient(135deg, #ffe66d, #ff9f1c); }
 
     .cell.highlight {
-      background-color: rgba(137, 220, 235, 0.5) !important;
-      border: 1px dashed #89dceb !important;
+      background-color: rgba(137, 220, 235, 0.45) !important;
+      border: 2px dashed #89dceb !important;
     }
 
     .cell.highlight-invalid {
-      background-color: rgba(243, 139, 168, 0.5) !important;
-      border: 1px dashed #f38ba8 !important;
+      background-color: rgba(243, 139, 168, 0.45) !important;
+      border: 2px dashed #f38ba8 !important;
     }
 
+    /* Area Pilihan Blok di Bawah Papan */
     .shapes-container {
       display: flex;
-      justify-content: space-around;
-      width: 100%;
-      margin-top: 10px;
-      min-height: 75px;
+      justify-content: space-evenly;
       align-items: center;
+      width: 100%;
+      height: clamp(100px, 18vh, 130px);
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 16px;
+      border: 1px dashed rgba(255, 255, 255, 0.08);
+      margin-top: 10px;
     }
 
     .shape-preview {
       display: grid;
-      gap: 2px;
-      padding: 4px;
-      border-radius: 6px;
-      background-color: rgba(255, 255, 255, 0.04);
+      gap: 3px;
+      padding: 6px;
+      border-radius: 8px;
       touch-action: none;
+      cursor: grab;
     }
 
     .shape-preview.dragging {
       position: fixed;
       pointer-events: none;
       z-index: 1000;
-      opacity: 0.9;
-      transform: scale(1.1);
+      opacity: 0.95;
+      transform: scale(1.15);
       margin: 0 !important;
     }
 
+    /* Ukuran blok di area pilihan bawah */
     .shape-cell { 
-      width: min(4vw, 15px); 
-      height: min(4vw, 15px); 
-      border-radius: 2px; 
+      width: clamp(14px, 4.5vw, 22px); 
+      height: clamp(14px, 4.5vw, 22px); 
+      border-radius: 4px; 
     }
     .shape-cell.planet-mars { background-color: #ff7b54; }
     .shape-cell.planet-earth { background-color: #4ea8de; }
@@ -281,12 +288,12 @@
       top: 0; left: 0; width: 100vw; height: 100vh;
       background-color: rgba(0, 0, 0, 0.85);
       display: flex; justify-content: center; align-items: center;
-      z-index: 999; backdrop-filter: blur(4px);
+      z-index: 999; backdrop-filter: blur(5px);
     }
     .modal.hidden { display: none; }
     .modal-content {
-      background: #1e1e2e; padding: 18px; border-radius: 14px;
-      border: 1px solid #89b4fa; text-align: center; width: 85%; max-width: 270px;
+      background: #1e1e2e; padding: 20px; border-radius: 18px;
+      border: 1px solid #89b4fa; text-align: center; width: 85%; max-width: 300px;
     }
   </style>
 </head>
@@ -294,46 +301,50 @@
 
   <!-- 1. HOME SCREEN -->
   <div id="screen-home" class="app-screen active">
-    <div>
+    <div style="margin-top: 10px;">
       <div class="sponsor-badge">Sponsored by GALAXY LABS 🚀</div>
       <h1 class="game-title">SOLAR BLAST</h1>
     </div>
     <div style="width: 100%;">
-      <button class="menu-btn btn-classic" onclick="startClassicMode()">PLAY CLASSIC ♾️️</button>
+      <button class="menu-btn btn-classic" onclick="startClassicMode()">PLAY CLASSIC ♾️</button>
       <button class="menu-btn btn-challenge" onclick="openChallengeMap()">CHALLENGE (1-100) 🎯</button>
     </div>
     <div class="history-card">
-      <h3>🏆 Riwayat Highscore</h3>
+      <h3>🏆 Highscore Terbaru</h3>
       <ul id="history-list" class="history-list"></ul>
     </div>
   </div>
 
   <!-- 2. CHALLENGE LEVEL MAP -->
   <div id="screen-levels" class="app-screen">
-    <button class="back-btn" onclick="showScreen('screen-home')">⬅ Kembali</button>
-    <h3 style="margin: 0 0 10px 0; font-size: 15px;">Pilih Level (1-100)</h3>
+    <button class="back-btn" onclick="showScreen('screen-home')">⬅ Menu</button>
+    <h3 style="margin: 10px 0; font-size: 16px;">Pilih Level (1-100)</h3>
     <div id="level-grid" class="level-grid"></div>
   </div>
 
-  <!-- 3. GAMEPLAY SCREEN -->
+  <!-- 3. GAMEPLAY SCREEN (BLOCK BLAST STYLE) -->
   <div id="screen-game" class="app-screen">
-    <button class="back-btn" onclick="exitGame()">⬅ Menu</button>
-    
-    <div class="score-container">
-      <div class="score-box" id="level-indicator">Classic</div>
-      <div class="score-box" id="challenge-star-box" style="display: none;">Target: <span id="star-count">0</span> / 3 ⭐</div>
-      <div class="score-box" id="score-box-container">Skor: <span id="score">0</span></div>
+    <div class="header-game">
+      <button class="back-btn" onclick="exitGame()">⬅ Menu</button>
+      <div class="score-container">
+        <div class="score-box" id="level-indicator">Classic</div>
+        <div class="score-box" id="challenge-star-box" style="display: none;">Target: <span id="star-count">0</span> / 3 ⭐</div>
+        <div class="score-box" id="score-box-container">Skor: <span id="score">0</span></div>
+      </div>
     </div>
 
+    <!-- Papan Utama -->
     <div id="board" class="board"></div>
+
+    <!-- Pilihan Blok di Bawah -->
     <div id="shapes-container" class="shapes-container"></div>
   </div>
 
   <!-- MODAL -->
   <div id="game-modal" class="modal hidden">
     <div class="modal-content">
-      <h3 id="modal-title" style="margin-top: 0; font-size: 16px;">MISSION FAILED 🚀</h3>
-      <p id="modal-desc" style="font-size: 13px;">Papan penuh!</p>
+      <h3 id="modal-title" style="margin-top: 0; font-size: 18px;">MISSION FAILED 🚀</h3>
+      <p id="modal-desc" style="font-size: 14px;">Papan penuh!</p>
       <button class="menu-btn btn-classic" onclick="closeModalAndRedirect()">Lanjut 🔄</button>
     </div>
   </div>
@@ -469,7 +480,7 @@
     function startChallengeLevel(level) {
       isChallengeMode = true;
       currentLevel = level;
-      document.getElementById('level-indicator').innerText = `Level ${level}`;
+      document.getElementById('level-indicator').innerText = `Lvl ${level}`;
       document.getElementById('score-box-container').style.display = 'none';
       document.getElementById('challenge-star-box').style.display = 'block';
       initGame();
@@ -533,7 +544,7 @@
       
       const cols = shape[0].length;
       container.style.display = 'grid';
-      container.style.gridTemplateColumns = `repeat(${cols}, min(4vw, 15px))`;
+      container.style.gridTemplateColumns = `repeat(${cols}, clamp(14px, 4.5vw, 22px))`;
 
       shape.forEach((row) => {
         row.forEach((val) => {
@@ -545,7 +556,7 @@
         });
       });
 
-      // TOUCH DRAG ACCURACY
+      // DRAG TOUCH CONTROL SESUAI STYLE BLOCK BLAST
       container.addEventListener('touchstart', (e) => {
         e.preventDefault();
         const touch = e.touches[0];
@@ -556,7 +567,7 @@
         draggedPlanetClass = planetClass;
 
         touchOffsetX = rect.width / 2;
-        touchOffsetY = rect.height + 30; // Melayang presisi di atas jari
+        touchOffsetY = rect.height + 40; // Posisi melayang nyaman di atas telunjuk
 
         container.classList.add('dragging');
         updateDragPosition(touch.clientX, touch.clientY);
