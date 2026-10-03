@@ -21,14 +21,14 @@
       align-items: center;
       min-height: 100vh;
       margin: 0;
-      padding: 10px;
+      padding: 8px;
       overflow: hidden;
     }
 
     .app-screen {
       display: none;
       width: 100%;
-      max-width: 380px;
+      max-width: 320px;
       flex-direction: column;
       align-items: center;
       text-align: center;
@@ -60,21 +60,21 @@
     }
 
     h1.game-title {
-      font-size: clamp(28px, 8vw, 36px);
-      letter-spacing: 3px;
+      font-size: clamp(24px, 7vw, 32px);
+      letter-spacing: 2px;
       color: #f5c2e7;
       text-shadow: 0 0 15px rgba(245, 194, 231, 0.6);
-      margin: 0 0 15px 0;
+      margin: 0 0 12px 0;
     }
 
     .menu-btn {
       width: 100%;
-      padding: 12px;
-      margin: 6px 0;
-      font-size: 15px;
+      padding: 10px;
+      margin: 5px 0;
+      font-size: 14px;
       font-weight: bold;
       border: none;
-      border-radius: 12px;
+      border-radius: 10px;
       cursor: pointer;
     }
 
@@ -95,13 +95,13 @@
       background: rgba(20, 15, 35, 0.85);
       border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 12px;
-      padding: 10px;
-      margin-top: 15px;
+      padding: 8px;
+      margin-top: 10px;
     }
 
     .history-card h3 {
       margin: 0 0 6px 0;
-      font-size: 14px;
+      font-size: 13px;
       color: #89dceb;
     }
 
@@ -109,15 +109,15 @@
       list-style: none;
       padding: 0;
       margin: 0;
-      max-height: 100px;
+      max-height: 90px;
       overflow-y: auto;
     }
 
     .history-item {
       display: flex;
       justify-content: space-between;
-      padding: 4px 8px;
-      font-size: 12px;
+      padding: 4px 6px;
+      font-size: 11px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
 
@@ -125,11 +125,11 @@
     .level-grid {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
-      gap: 8px;
-      max-height: 60vh;
+      gap: 6px;
+      max-height: 55vh;
       overflow-y: auto;
       width: 100%;
-      padding: 8px;
+      padding: 6px;
       background: rgba(20, 15, 35, 0.85);
       border-radius: 12px;
       border: 1px solid rgba(255, 255, 255, 0.1);
@@ -141,8 +141,8 @@
       border: 1px solid rgba(255, 255, 255, 0.1);
       color: #cdd6f4;
       font-weight: bold;
-      border-radius: 8px;
-      font-size: 13px;
+      border-radius: 6px;
+      font-size: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -157,45 +157,45 @@
       background: transparent;
       border: 1px solid rgba(255, 255, 255, 0.3);
       color: #fff;
-      padding: 6px 12px;
+      padding: 5px 10px;
       border-radius: 8px;
       font-size: 12px;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       align-self: flex-start;
     }
 
-    /* === 3. GAMEPLAY (UKURAN DIPERKECIL & RESPOSIF HP) === */
+    /* === 3. GAMEPLAY (UKURAN LEBIH KECIL SUPAYA TIDAK KETOPONG) === */
     .score-container {
       display: flex;
       justify-content: center;
-      gap: 10px;
-      margin-bottom: 10px;
+      gap: 8px;
+      margin-bottom: 8px;
       width: 100%;
     }
 
     .score-box {
-      font-size: 13px;
+      font-size: 12px;
       font-weight: bold;
       color: #89dceb;
       background: rgba(255, 255, 255, 0.05);
-      padding: 4px 10px;
-      border-radius: 15px;
+      padding: 4px 8px;
+      border-radius: 12px;
       border: 1px solid rgba(137, 220, 235, 0.2);
     }
 
-    /* Board yang dapat menyesuaikan layar HP */
+    /* Ukuran Papan Diperkecil agar Pas di Layar HP Sempit */
     .board {
       display: grid;
       grid-template-columns: repeat(8, 1fr);
       grid-template-rows: repeat(8, 1fr);
-      gap: 3px;
-      width: min(82vw, 320px);
-      height: min(82vw, 320px);
+      gap: 2px;
+      width: min(72vw, 260px);
+      height: min(72vw, 260px);
       background-color: rgba(20, 15, 35, 0.85);
-      padding: 6px;
-      border-radius: 12px;
+      padding: 4px;
+      border-radius: 10px;
       margin: 0 auto;
-      box-shadow: 0 0 20px rgba(137, 180, 250, 0.15);
+      box-shadow: 0 0 15px rgba(137, 180, 250, 0.15);
       border: 1px solid rgba(255, 255, 255, 0.12);
     }
 
@@ -203,17 +203,17 @@
       width: 100%;
       height: 100%;
       background-color: rgba(10, 8, 20, 0.9);
-      border-radius: 4px;
+      border-radius: 3px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: clamp(12px, 4vw, 16px);
+      font-size: clamp(10px, 3.5vw, 14px);
       position: relative;
     }
 
     .cell.has-star::after {
       content: '⭐';
-      filter: drop-shadow(0 0 4px #f9e2af);
+      filter: drop-shadow(0 0 3px #f9e2af);
     }
 
     .cell.filled.planet-mars { background: radial-gradient(circle at 35% 35%, #ff7b54, #ffb26b); }
@@ -236,15 +236,15 @@
       display: flex;
       justify-content: space-around;
       width: 100%;
-      margin-top: 10px;
-      min-height: 70px;
+      margin-top: 8px;
+      min-height: 60px;
       align-items: center;
     }
 
     .shape-preview {
       display: grid;
       gap: 2px;
-      padding: 4px;
+      padding: 3px;
       border-radius: 6px;
       background-color: rgba(255, 255, 255, 0.04);
       touch-action: none;
@@ -260,8 +260,8 @@
     }
 
     .shape-cell { 
-      width: min(4.5vw, 16px); 
-      height: min(4.5vw, 16px); 
+      width: min(3.8vw, 13px); 
+      height: min(3.8vw, 13px); 
       border-radius: 2px; 
     }
     .shape-cell.planet-mars { background-color: #ff7b54; }
@@ -280,8 +280,8 @@
     }
     .modal.hidden { display: none; }
     .modal-content {
-      background: #1e1e2e; padding: 20px; border-radius: 16px;
-      border: 1px solid #89b4fa; text-align: center; width: 85%; max-width: 280px;
+      background: #1e1e2e; padding: 16px; border-radius: 14px;
+      border: 1px solid #89b4fa; text-align: center; width: 85%; max-width: 260px;
     }
   </style>
 </head>
@@ -306,7 +306,7 @@
   <!-- 2. CHALLENGE LEVEL MAP -->
   <div id="screen-levels" class="app-screen">
     <button class="back-btn" onclick="showScreen('screen-home')">⬅ Kembali</button>
-    <h3 style="margin: 0 0 10px 0;">Pilih Level (1-100)</h3>
+    <h3 style="margin: 0 0 8px 0; font-size: 14px;">Pilih Level (1-100)</h3>
     <div id="level-grid" class="level-grid"></div>
   </div>
 
@@ -327,8 +327,8 @@
   <!-- MODAL -->
   <div id="game-modal" class="modal hidden">
     <div class="modal-content">
-      <h3 id="modal-title" style="margin-top: 0;">MISSION FAILED 🚀</h3>
-      <p id="modal-desc" style="font-size: 13px;">Papan penuh!</p>
+      <h3 id="modal-title" style="margin-top: 0; font-size: 16px;">MISSION FAILED 🚀</h3>
+      <p id="modal-desc" style="font-size: 12px;">Papan penuh!</p>
       <button class="menu-btn btn-classic" onclick="closeModalAndRedirect()">Lanjut 🔄</button>
     </div>
   </div>
@@ -528,7 +528,7 @@
       
       const cols = shape[0].length;
       container.style.display = 'grid';
-      container.style.gridTemplateColumns = `repeat(${cols}, min(4.5vw, 16px))`;
+      container.style.gridTemplateColumns = `repeat(${cols}, min(3.8vw, 13px))`;
 
       shape.forEach((row) => {
         row.forEach((val) => {
@@ -540,7 +540,7 @@
         });
       });
 
-      // KONTROL TOUCH PRESISI & STABIL UNTUK HP
+      // KONTROL TOUCH PRESISI
       container.addEventListener('touchstart', (e) => {
         e.preventDefault();
         const touch = e.touches[0];
@@ -550,9 +550,8 @@
         draggedShapeMatrix = shape;
         draggedPlanetClass = planetClass;
 
-        // Tentukan offset jari agar blok berada sedikit di atas sentuhan telunjuk
         touchOffsetX = rect.width / 2;
-        touchOffsetY = rect.height + 30; // Posisi melayang di atas jari agar terlihat jelas
+        touchOffsetY = rect.height + 25; // Posisi melayang di atas jari
 
         container.classList.add('dragging');
         updateDragPosition(touch.clientX, touch.clientY);
@@ -566,13 +565,13 @@
       e.preventDefault();
       const touch = e.touches[0];
       updateDragPosition(touch.clientX, touch.clientY);
-      handleHover(touch.clientX, touch.clientY - touchOffsetY + 15);
+      handleHover(touch.clientX, touch.clientY - touchOffsetY + 10);
     }, { passive: false });
 
     window.addEventListener('touchend', (e) => {
       if (!draggedShape) return;
       const touch = e.changedTouches[0];
-      handleDropAt(touch.clientX, touch.clientY - touchOffsetY + 15);
+      handleDropAt(touch.clientX, touch.clientY - touchOffsetY + 10);
     });
 
     function updateDragPosition(x, y) {
@@ -614,7 +613,6 @@
         }
       }
 
-      // Revert Jika Drop Gagal
       if (draggedShape) {
         draggedShape.classList.remove('dragging');
         draggedShape.style.position = '';
