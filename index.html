@@ -2,12 +2,14 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>Solar Blast App</title>
   <style>
     * {
       box-sizing: border-box;
       user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
     }
 
     body {
@@ -202,6 +204,7 @@
       margin: 0 auto;
       box-shadow: 0 0 25px rgba(137, 180, 250, 0.15);
       border: 1px solid rgba(255, 255, 255, 0.12);
+      touch-action: none;
     }
 
     .cell {
@@ -242,6 +245,7 @@
       margin-top: 20px;
       min-height: 90px;
       align-items: center;
+      touch-action: none;
     }
 
     .shape-preview {
@@ -251,6 +255,15 @@
       padding: 6px;
       border-radius: 8px;
       background-color: rgba(255, 255, 255, 0.04);
+      touch-action: none;
+    }
+
+    .shape-preview.dragging {
+      opacity: 0.8;
+      position: fixed;
+      pointer-events: none;
+      z-index: 1000;
+      transform: scale(1.1);
     }
 
     .shape-cell { width: 18px; height: 18px; border-radius: 3px; }
@@ -350,14 +363,12 @@
       [[1, 0], [1, 0], [1, 1]], [[0, 1], [0, 1], [1, 1]]
     ];
 
-    // ROUTING / NAVIGASI LAYAR
     function showScreen(screenId) {
       document.querySelectorAll('.app-screen').forEach(s => s.classList.remove('active'));
       document.getElementById(screenId).classList.add('active');
       if(screenId === 'screen-home') renderHistory();
     }
 
-    // HISTORY HIGH SCORE
     function saveHistory(finalScore, mode) {
       const newRecord = { score: finalScore, mode: mode, date: new Date().toLocaleDateString('id-ID') };
       highscoreHistory.unshift(newRecord);
@@ -372,7 +383,6 @@
         : highscoreHistory.map(h => `<li class="history-item"><span>${h.mode}</span> <strong>${h.score} Poin</strong></li>`).join('');
     }
 
-    // MODE CLASSIC
     function startClassicMode() {
       isChallengeMode = false;
       document.getElementById('level-indicator').innerText = 'Classic Mode';
@@ -380,7 +390,6 @@
       showScreen('screen-game');
     }
 
-    // MODE CHALLENGE
     function openChallengeMap() {
       const grid = document.getElementById('level-grid');
       grid.innerHTML = '';
@@ -407,13 +416,11 @@
       showScreen('screen-game');
     }
 
-    // INISIALISASI GAMEBOARD
     function initGame() {
       score = 0;
       scoreElement.innerText = score;
       boardState = Array(BOARD_SIZE).fill(null).map(() => Array(BOARD_SIZE).fill(null));
 
-      // Buat Rintangan/Bentuk Papan Unik untuk Mode Challenge
       if (isChallengeMode) {
         generateChallengeObstacles(currentLevel);
       }
@@ -422,9 +429,7 @@
       generateShapes();
     }
 
-    // BENTUK PAPAN BERBEDA PADA SETIAP LEVEL (1-100)
     function generateChallengeObstacles(level) {
-      // Menggunakan rumus matematika sederhana untuk menghasilkan variasi bentuk unik di tiap level
       const obstacleCount = Math.min(4 + Math.floor(level / 5), 24); 
       let placed = 0;
       
@@ -433,7 +438,7 @@
         let c = (level * 5 + placed * 3) % BOARD_SIZE;
         
         if (boardState[r][c] === null) {
-          boardState[r][c] = 'blocked'; // Petak terkunci / tidak bisa diisi
+          boardState[r][c] = 'blocked';
           placed++;
         }
       }
@@ -495,6 +500,7 @@
         });
       });
 
+      // Event Mouse (Desktop)
       container.addEventListener('dragstart', (e) => {
         draggedShape = container;
         draggedShapeMatrix = shape;
@@ -502,7 +508,87 @@
         e.dataTransfer.setData('text/plain', '');
       });
 
+      // Event Sentuhan (HP / Mobile Touch Events)
+      container.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        const touch = e.touches[0];
+        
+        draggedShape = container;
+        draggedShapeMatrix = shape;
+        draggedPlanetClass = planetClass;
+        grabRowOffset = 0;
+        grabColOffset = 0;
+
+        container.classList.add('dragging');
+        moveAt(touch.clientX, touch.clientY);
+      }, { passive: false });
+
+      container.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        if (!draggedShape) return;
+        const touch = e.touches[0];
+        moveAt(touch.clientX, touch.clientY);
+        handleTouchMove(touch.clientX, touch.clientY);
+      }, { passive: false });
+
+      container.addEventListener('touchend', (e) => {
+        if (!draggedShape) return;
+        const touch = e.changedTouches[0];
+        handleTouchEnd(touch.clientX, touch.clientY);
+      });
+
       shapesContainer.appendChild(container);
+    }
+
+    function moveAt(pageX, pageY) {
+      if (draggedShape) {
+        draggedShape.style.left = pageX - draggedShape.offsetWidth / 2 + 'px';
+        draggedShape.style.top = pageY - draggedShape.offsetHeight - 20 + 'px'; // Diangkat sedikit di atas jari
+      }
+    }
+
+    function handleTouchMove(clientX, clientY) {
+      clearHighlights();
+      const el = document.elementFromPoint(clientX, clientY - 40);
+      if (!el || !el.classList.contains('cell')) return;
+
+      const startRow = parseInt(el.dataset.row) - grabRowOffset;
+      const startCol = parseInt(el.dataset.col) - grabColOffset;
+
+      const isValid = canPlaceShape(draggedShapeMatrix, startRow, startCol);
+      highlightShape(draggedShapeMatrix, startRow, startCol, isValid);
+    }
+
+    function handleTouchEnd(clientX, clientY) {
+      clearHighlights();
+      if (!draggedShape) return;
+
+      draggedShape.classList.remove('dragging');
+      draggedShape.style.position = '';
+      draggedShape.style.left = '';
+      draggedShape.style.top = '';
+
+      const el = document.elementFromPoint(clientX, clientY - 40);
+      if (el && el.classList.contains('cell')) {
+        const startRow = parseInt(el.dataset.row) - grabRowOffset;
+        const startCol = parseInt(el.dataset.col) - grabColOffset;
+
+        if (canPlaceShape(draggedShapeMatrix, startRow, startCol)) {
+          placeShape(draggedShapeMatrix, startRow, startCol, draggedPlanetClass);
+          draggedShape.remove();
+          draggedShapeMatrix = null;
+          draggedShape = null;
+
+          checkAndClearLines();
+          checkChallengeWin();
+
+          if (shapesContainer.children.length === 0) generateShapes();
+          else checkGameOver();
+          return;
+        }
+      }
+      draggedShape = null;
+      draggedShapeMatrix = null;
     }
 
     function clearHighlights() {
@@ -632,7 +718,6 @@
       }
     }
 
-    // PENGECEKAN MENANG LEVEL CHALLENGE (PAPAN PENUH)
     function checkChallengeWin() {
       if (!isChallengeMode) return;
 
@@ -692,7 +777,6 @@
       showScreen('screen-home');
     }
 
-    // Jalankan awal
     renderHistory();
   </script>
 </body>
