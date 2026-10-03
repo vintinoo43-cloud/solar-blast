@@ -206,12 +206,30 @@
       height: 42px;
       background-color: rgba(10, 8, 20, 0.9);
       border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      position: relative;
     }
 
     .cell.blocked {
       background-color: #313244 !important;
       border: 1px solid #45475a;
       box-shadow: inset 0 0 8px #11111b;
+    }
+
+    /* Blok Bintang */
+    .cell.has-star::after {
+      content: '⭐';
+      font-size: 20px;
+      filter: drop-shadow(0 0 6px #f9e2af);
+      animation: starPulse 1.5s infinite ease-in-out;
+    }
+
+    @keyframes starPulse {
+      0%, 100% { transform: scale(0.9); }
+      50% { transform: scale(1.1); }
     }
 
     /* Warna Planet */
@@ -312,6 +330,7 @@
     
     <div class="score-container">
       <div class="score-box" id="level-indicator">Classic</div>
+      <div class="score-box" id="challenge-star-box" style="display: none;">Target: <span id="star-count">0</span> / 3 ⭐</div>
       <div class="score-box" id="score-box-container">Skor: <span id="score">0</span></div>
     </div>
 
@@ -329,17 +348,93 @@
   </div>
 
   <script>
+    // === WEB AUDIO API (SFX SYNTHESIZER SPACE) ===
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSpaceBlastSFX(linesCleared = 1) {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      // Laser Sine Wave futuristik dengan sweeping pitch menurun
+      osc.type = 'sine';
+      
+      const now = audioCtx.currentTime;
+      const baseFreq = 300 + (linesCleared * 120); // Nada lebih tinggi jika pecah combo (banyak baris)
+      
+      osc.frequency.setValueAtTime(baseFreq, now);
+      osc.frequency.exponentialRampToValueAtTime(40, now + 0.35);
+
+      // Effect Fade-out halus
+      gain.gain.setValueAtTime(0.3, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.35);
+    }
+
+    function playPlaceSFX() {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      const now = audioCtx.currentTime;
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(150, now);
+      osc.frequency.exponentialRampToValueAtTime(80, now + 0.08);
+
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.08);
+    }
+
+    function playStarSFX() {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      const now = audioCtx.currentTime;
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(523.25, now); // C5
+      osc.frequency.setValueAtTime(659.25, now + 0.08); // E5
+      osc.frequency.setValueAtTime(783.99, now + 0.16); // G5
+
+      gain.gain.setValueAtTime(0.25, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.3);
+    }
+
+    // === GAME LOGIC ===
     const BOARD_SIZE = 8;
     let isChallengeMode = false;
     let currentLevel = 1;
     let score = 0;
+    let starsCollected = 0;
+    const TARGET_STARS = 3;
     
-    let boardState = Array(BOARD_SIZE).fill(null).map(() => Array(BOARD_SIZE).fill(null));
+    let boardState = [];
     let unlockedLevels = parseInt(localStorage.getItem('solar_unlocked_level')) || 1;
     let highscoreHistory = JSON.parse(localStorage.getItem('solar_history')) || [];
 
     const boardElement = document.getElementById('board');
     const scoreElement = document.getElementById('score');
+    const starCountElement = document.getElementById('star-count');
     const shapesContainer = document.getElementById('shapes-container');
 
     let draggedShape = null;
@@ -379,6 +474,7 @@
       isChallengeMode = false;
       document.getElementById('level-indicator').innerText = 'Classic Mode';
       document.getElementById('score-box-container').style.display = 'block';
+      document.getElementById('challenge-star-box').style.display = 'none';
       initGame();
       showScreen('screen-game');
     }
@@ -406,34 +502,39 @@
       currentLevel = level;
       document.getElementById('level-indicator').innerText = `Level ${level}`;
       document.getElementById('score-box-container').style.display = 'none';
+      document.getElementById('challenge-star-box').style.display = 'block';
       initGame();
       showScreen('screen-game');
     }
 
     function initGame() {
       score = 0;
+      starsCollected = 0;
       scoreElement.innerText = score;
-      boardState = Array(BOARD_SIZE).fill(null).map(() => Array(BOARD_SIZE).fill(null));
+      starCountElement.innerText = starsCollected;
+      
+      boardState = Array(BOARD_SIZE).fill(null).map(() => 
+        Array(BOARD_SIZE).fill(null).map(() => ({ type: null, planet: '', hasStar: false }))
+      );
 
       if (isChallengeMode) {
-        generateChallengeObstacles(currentLevel);
+        generateChallengeStars(currentLevel);
       }
 
       createBoard();
       generateShapes();
     }
 
-    function generateChallengeObstacles(level) {
-      // Menghasilkan rintangan hitam unik per level
-      const obstacleCount = Math.min(2 + Math.floor(level / 6), 20); 
+    function generateChallengeStars(level) {
+      const starCount = 3 + Math.floor(Math.random() * 2);
       let placed = 0;
-      
-      while(placed < obstacleCount) {
-        let r = (level * 3 + placed * 7) % BOARD_SIZE;
-        let c = (level * 5 + placed * 3) % BOARD_SIZE;
+
+      while(placed < starCount) {
+        let r = Math.floor(Math.random() * BOARD_SIZE);
+        let c = Math.floor(Math.random() * BOARD_SIZE);
         
-        if (boardState[r][c] === null) {
-          boardState[r][c] = 'blocked';
+        if (!boardState[r][c].hasStar) {
+          boardState[r][c].hasStar = true;
           placed++;
         }
       }
@@ -448,8 +549,8 @@
           cell.dataset.row = r;
           cell.dataset.col = c;
 
-          if (boardState[r][c] === 'blocked') {
-            cell.classList.add('blocked');
+          if (boardState[r][c].hasStar) {
+            cell.classList.add('has-star');
           }
 
           boardElement.appendChild(cell);
@@ -503,7 +604,7 @@
         e.dataTransfer.setData('text/plain', '');
       });
 
-      // HP Touch
+      // Touch Mobile
       container.addEventListener('touchstart', (e) => {
         e.preventDefault();
         const touch = e.touches[0];
@@ -574,11 +675,7 @@
           draggedShapeMatrix = null;
           draggedShape = null;
 
-          if (isChallengeMode) {
-            checkChallengeWin();
-          } else {
-            checkAndClearLines();
-          }
+          checkAndClearLines();
 
           if (shapesContainer.children.length === 0) generateShapes();
           else checkGameOver();
@@ -638,11 +735,7 @@
         draggedShape.remove();
         draggedShapeMatrix = null;
 
-        if (isChallengeMode) {
-          checkChallengeWin();
-        } else {
-          checkAndClearLines();
-        }
+        checkAndClearLines();
 
         if (shapesContainer.children.length === 0) generateShapes();
         else checkGameOver();
@@ -654,7 +747,7 @@
         for (let c = 0; c < shape[r].length; c++) {
           if (shape[r][c] === 1) {
             const tr = startRow + r, tc = startCol + c;
-            if (tr < 0 || tr >= BOARD_SIZE || tc < 0 || tc >= BOARD_SIZE || boardState[tr][tc] !== null) {
+            if (tr < 0 || tr >= BOARD_SIZE || tc < 0 || tc >= BOARD_SIZE || boardState[tr][tc].type !== null) {
               return false;
             }
           }
@@ -669,75 +762,86 @@
         for (let c = 0; c < shape[r].length; c++) {
           if (shape[r][c] === 1) {
             const tr = startRow + r, tc = startCol + c;
-            boardState[tr][tc] = planetClass;
+            boardState[tr][tc].type = 'filled';
+            boardState[tr][tc].planet = planetClass;
             count++;
+            
             const cell = boardElement.querySelector(`[data-row="${tr}"][data-col="${tc}"]`);
             if (cell) cell.classList.add('filled', planetClass);
           }
         }
       }
+      playPlaceSFX(); // Sound Effect Pas Pasang Block
       score += count;
       scoreElement.innerText = score;
     }
 
-    // MODE CLASSIC: MEKANISME PECAH BARIS & KOLOM
     function checkAndClearLines() {
-      let rows = [], cols = [];
+      let rowsToClear = [], colsToClear = [];
+
       for (let r = 0; r < BOARD_SIZE; r++) {
-        if (boardState[r].every(v => v !== null && v !== 'blocked')) rows.push(r);
+        if (boardState[r].every(c => c.type === 'filled')) rowsToClear.push(r);
       }
       for (let c = 0; c < BOARD_SIZE; c++) {
         let full = true;
         for (let r = 0; r < BOARD_SIZE; r++) {
-          if (boardState[r][c] === null || boardState[r][c] === 'blocked') full = false;
+          if (boardState[r][c].type !== 'filled') full = false;
         }
-        if (full) cols.push(c);
+        if (full) colsToClear.push(c);
       }
 
-      rows.forEach(r => {
-        for (let c = 0; c < BOARD_SIZE; c++) {
-          if (boardState[r][c] !== 'blocked') {
-            boardState[r][c] = null;
-            const cell = boardElement.querySelector(`[data-row="${r}"][data-col="${c}"]`);
-            if (cell) cell.className = 'cell';
-          }
+      let cellsToReset = new Set();
+      let starCleared = false;
+
+      rowsToClear.forEach(r => {
+        for (let c = 0; c < BOARD_SIZE; c++) cellsToReset.add(`${r},${c}`);
+      });
+      colsToClear.forEach(c => {
+        for (let r = 0; r < BOARD_SIZE; r++) cellsToReset.add(`${r},${c}`);
+      });
+
+      const totalLinesCleared = rowsToClear.length + colsToClear.length;
+
+      // Jalankan Sound Effect Pecah
+      if (totalLinesCleared > 0) {
+        playSpaceBlastSFX(totalLinesCleared);
+      }
+
+      // Proses Reset Kotak
+      cellsToReset.forEach(coord => {
+        const [r, c] = coord.split(',').map(Number);
+        
+        if (isChallengeMode && boardState[r][c].hasStar) {
+          starsCollected++;
+          starCountElement.innerText = starsCollected;
+          boardState[r][c].hasStar = false;
+          starCleared = true;
+        }
+
+        boardState[r][c].type = null;
+        boardState[r][c].planet = '';
+
+        const cell = boardElement.querySelector(`[data-row="${r}"][data-col="${c}"]`);
+        if (cell) {
+          cell.className = 'cell';
         }
       });
 
-      cols.forEach(c => {
-        for (let r = 0; r < BOARD_SIZE; r++) {
-          if (boardState[r][c] !== 'blocked') {
-            boardState[r][c] = null;
-            const cell = boardElement.querySelector(`[data-row="${r}"][data-col="${c}"]`);
-            if (cell) cell.className = 'cell';
-          }
-        }
-      });
+      if (starCleared) {
+        playStarSFX(); // SFX Khusus saat Bintang Didapat
+      }
 
-      if (rows.length + cols.length > 0) {
-        score += (rows.length + cols.length) * 100;
+      if (totalLinesCleared > 0) {
+        score += totalLinesCleared * 100;
         scoreElement.innerText = score;
       }
-    }
 
-    // MODE CHALLENGE: WIN CONDITION KETIKA SEMUA PETAK TERISI PENUH
-    function checkChallengeWin() {
-      let isFull = true;
-      for (let r = 0; r < BOARD_SIZE; r++) {
-        for (let c = 0; c < BOARD_SIZE; c++) {
-          if (boardState[r][c] === null) {
-            isFull = false;
-            break;
-          }
-        }
-      }
-
-      if (isFull) {
+      if (isChallengeMode && starsCollected >= TARGET_STARS) {
         if (currentLevel === unlockedLevels && unlockedLevels < 100) {
           unlockedLevels++;
           localStorage.setItem('solar_unlocked_level', unlockedLevels);
         }
-        showModal("LEVEL COMPLETED! 🎉", `Selamat! Kamu berhasil memenuhi seluruh papan Level ${currentLevel}!`);
+        showModal("LEVEL COMPLETED! ⭐", `Selamat! Kamu berhasil mengumpulkan 3 Bintang di Level ${currentLevel}!`);
       }
     }
 
@@ -757,7 +861,7 @@
 
       if (!canPlace) {
         if (!isChallengeMode) saveHistory(score, 'Classic');
-        showModal("MISSION FAILED 🚀", isChallengeMode ? "Tidak ada ruang tersisa untuk menuhin papan!" : `Tidak ada ruang tersisa! Skor Akhir: ${score}`);
+        showModal("MISSION FAILED 🚀", isChallengeMode ? `Kamu gagal mengumpulkan 3 Bintang! (${starsCollected}/3 ⭐)` : `Tidak ada ruang tersisa! Skor Akhir: ${score}`);
       }
     }
 
