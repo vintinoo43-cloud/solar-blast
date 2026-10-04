@@ -29,7 +29,6 @@
       align-items: center;
     }
 
-    /* Menggunakan 100dvh & padding ketat agar 100% muat di layar HP apapun */
     .app-screen {
       display: none;
       width: 100%;
@@ -128,18 +127,40 @@
       border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
 
-    /* === 2. PETA LEVEL CHALLENGE === */
+    /* === 2. PETA LEVEL CHALLENGE (SCROLL BISA DIPAKAI BEBAS) === */
+    .challenge-header {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      flex-shrink: 0;
+    }
+
     .level-grid {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
-      gap: 6px;
-      max-height: 60dvh;
-      overflow-y: auto;
+      gap: 8px;
       width: 100%;
-      padding: 6px;
+      flex: 1; /* Mengisi seluruh sisa ruang layar */
+      min-height: 0; /* Penting agar container fleksibel dan bisa di-scroll */
+      overflow-y: auto; /* Mengaktifkan Scrollbar secara lancar */
+      touch-action: pan-y; /* Mengizinkan gesture scroll pada layar sentuh */
+      padding: 10px 6px;
       background: rgba(20, 15, 35, 0.85);
       border-radius: 14px;
       border: 1px solid rgba(255, 255, 255, 0.1);
+      box-sizing: border-box;
+      -webkit-overflow-scrolling: touch; /* Smooth scroll di iOS */
+    }
+
+    /* Kustomisasi Tampilan Scrollbar */
+    .level-grid::-webkit-scrollbar {
+      width: 6px;
+    }
+    .level-grid::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
     }
 
     .level-btn {
@@ -148,23 +169,25 @@
       border: 1px solid rgba(255, 255, 255, 0.1);
       color: #cdd6f4;
       font-weight: bold;
-      border-radius: 8px;
-      font-size: 12px;
+      border-radius: 10px;
+      font-size: 13px;
       display: flex;
       align-items: center;
       justify-content: center;
+      cursor: pointer;
     }
 
     .level-btn.unlocked {
       background: linear-gradient(135deg, #a6e3a1, #94e2d5);
       color: #11111b;
+      box-shadow: 0 2px 8px rgba(166, 227, 161, 0.3);
     }
 
     .back-btn {
       background: rgba(255, 255, 255, 0.08);
       border: 1px solid rgba(255, 255, 255, 0.2);
       color: #fff;
-      padding: 5px 12px;
+      padding: 6px 14px;
       border-radius: 18px;
       font-size: 11px;
       font-weight: 600;
@@ -195,17 +218,15 @@
       border: 1px solid rgba(137, 220, 235, 0.2);
     }
 
-    /* Wrapper Papan Dibuat Fleksibel Namun Tidak Mengambil Banyak Ruang */
     .board-wrapper {
       flex: 1;
       display: flex;
       align-items: center;
       justify-content: center;
       width: 100%;
-      min-height: 0; /* Penting untuk flexbox agar tidak meluap */
+      min-height: 0;
     }
 
-    /* Ukuran Papan Diperkecil Maksimal min(72vw, 38dvh) Agar Tidak Mendorong Elemen Bawah */
     .board {
       display: grid;
       grid-template-columns: repeat(8, 1fr);
@@ -255,7 +276,6 @@
       border: 2px dashed #f38ba8 !important;
     }
 
-    /* Area Pilihan Blok di Bawah Dikunci Ukuannya Agar Pas Dalam Layar */
     .shapes-container {
       display: flex;
       justify-content: space-evenly;
@@ -333,10 +353,13 @@
     </div>
   </div>
 
-  <!-- 2. CHALLENGE LEVEL MAP -->
+  <!-- 2. CHALLENGE LEVEL MAP (BISA DI-SCROLL FULL 1-100) -->
   <div id="screen-levels" class="app-screen">
-    <button class="back-btn" onclick="showScreen('screen-home')">⬅ Menu</button>
-    <h3 style="margin: 6px 0; font-size: 14px;">Pilih Level (1-100)</h3>
+    <div class="challenge-header">
+      <button class="back-btn" onclick="showScreen('screen-home')">⬅ Menu</button>
+      <h3 style="margin: 0; font-size: 14px;">Pilih Level (1-100)</h3>
+      <div style="width: 50px;"></div>
+    </div>
     <div id="level-grid" class="level-grid"></div>
   </div>
 
@@ -356,7 +379,7 @@
       <div id="board" class="board"></div>
     </div>
 
-    <!-- Pilihan Blok di Bawah (Pasti Tampak & Tidak Terpotong) -->
+    <!-- Pilihan Blok di Bawah -->
     <div id="shapes-container" class="shapes-container"></div>
   </div>
 
@@ -502,15 +525,31 @@
     function openChallengeMap() {
       const grid = document.getElementById('level-grid');
       grid.innerHTML = '';
+      
+      let activeLevelBtn = null;
+
       for (let i = 1; i <= 100; i++) {
         const btn = document.createElement('button');
         btn.className = `level-btn ${i <= unlockedLevels ? 'unlocked' : ''}`;
         btn.innerText = i <= unlockedLevels ? i : '🔒';
-        if (i <= unlockedLevels) btn.onclick = () => startChallengeLevel(i);
-        else btn.style.opacity = '0.4';
+        
+        if (i <= unlockedLevels) {
+          btn.onclick = () => startChallengeLevel(i);
+          if (i === unlockedLevels) activeLevelBtn = btn;
+        } else {
+          btn.style.opacity = '0.4';
+        }
         grid.appendChild(btn);
       }
+      
       showScreen('screen-levels');
+
+      // Otomatis scroll ke posisi level yang terbuka saat ini
+      if (activeLevelBtn) {
+        setTimeout(() => {
+          activeLevelBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
+      }
     }
 
     function startChallengeLevel(level) {
