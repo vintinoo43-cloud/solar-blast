@@ -9,7 +9,7 @@
       box-sizing: border-box;
       user-select: none;
       -webkit-user-select: none;
-      touch-action: none;
+      /* touch-action: none DIPINDAHKAN dari global agar scroll berjalan normal */
     }
 
     html, body {
@@ -117,6 +117,7 @@
       margin: 0;
       max-height: 90px;
       overflow-y: auto;
+      touch-action: pan-y !important;
     }
 
     .history-item {
@@ -127,7 +128,7 @@
       border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
 
-    /* === 2. PETA LEVEL CHALLENGE (SCROLL BISA DIPAKAI BEBAS) === */
+    /* === 2. PETA LEVEL CHALLENGE (PENGATURAN SCROLL AKTIF 100%) === */
     .challenge-header {
       width: 100%;
       display: flex;
@@ -142,24 +143,23 @@
       grid-template-columns: repeat(5, 1fr);
       gap: 8px;
       width: 100%;
-      flex: 1; /* Mengisi seluruh sisa ruang layar */
-      min-height: 0; /* Penting agar container fleksibel dan bisa di-scroll */
-      overflow-y: auto; /* Mengaktifkan Scrollbar secara lancar */
-      touch-action: pan-y; /* Mengizinkan gesture scroll pada layar sentuh */
+      flex: 1;
+      min-height: 0;
+      overflow-y: scroll !important; /* Mengaktifkan scroll vertikal paksa */
+      touch-action: pan-y !important; /* Mengizinkan geser sentuhan jari ke atas/bawah */
       padding: 10px 6px;
       background: rgba(20, 15, 35, 0.85);
       border-radius: 14px;
       border: 1px solid rgba(255, 255, 255, 0.1);
       box-sizing: border-box;
-      -webkit-overflow-scrolling: touch; /* Smooth scroll di iOS */
+      -webkit-overflow-scrolling: touch;
     }
 
-    /* Kustomisasi Tampilan Scrollbar */
     .level-grid::-webkit-scrollbar {
       width: 6px;
     }
     .level-grid::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.3);
       border-radius: 4px;
     }
 
@@ -241,6 +241,7 @@
       border-radius: 14px;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
       border: 1px solid rgba(255, 255, 255, 0.12);
+      touch-action: none; /* touch-action ditaruh khusus pada area game */
     }
 
     .cell {
@@ -289,6 +290,7 @@
       border: 1px dashed rgba(255, 255, 255, 0.08);
       box-sizing: border-box;
       margin-top: 4px;
+      touch-action: none;
     }
 
     .shape-preview {
@@ -296,7 +298,7 @@
       gap: 2px;
       padding: 4px;
       border-radius: 6px;
-      touch-action: none;
+      touch-action: none; /* Khusus elemen yang di-drag saja yang dipasang touch-action: none */
       cursor: grab;
     }
 
@@ -353,7 +355,7 @@
     </div>
   </div>
 
-  <!-- 2. CHALLENGE LEVEL MAP (BISA DI-SCROLL FULL 1-100) -->
+  <!-- 2. CHALLENGE LEVEL MAP -->
   <div id="screen-levels" class="app-screen">
     <div class="challenge-header">
       <button class="back-btn" onclick="showScreen('screen-home')">⬅ Menu</button>
@@ -544,11 +546,11 @@
       
       showScreen('screen-levels');
 
-      // Otomatis scroll ke posisi level yang terbuka saat ini
+      // Fokuskan scroll ke level tertinggi yang saat ini terbuka
       if (activeLevelBtn) {
         setTimeout(() => {
           activeLevelBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 100);
+        }, 150);
       }
     }
 
